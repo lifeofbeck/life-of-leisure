@@ -27,7 +27,7 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
-.topbar{position:fixed;top:0;left:0;right:0;z-index:30;pointer-events:none;height:calc(env(safe-area-inset-top,0px) + 6px);background:#FFFBF4;border-bottom:2px solid #C8322F}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:30;pointer-events:none;height:calc(env(safe-area-inset-top,0px) + 10px);background:#FFFBF4;border-bottom:1px solid #E6D7BD}
 .topbar .awning{margin-inline:0}
 html,body{margin:0}
 html{-webkit-text-size-adjust:100%;background:#F6EFE3 repeating-linear-gradient(90deg,#CFE3DF 0 22px,#F6EFE3 22px 44px)}
@@ -241,7 +241,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-09-27-6';
+const APP_VERSION='2026-09-27-7';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
