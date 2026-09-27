@@ -242,7 +242,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-09-27-10';
+const APP_VERSION='2026-09-27-11';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -254,6 +254,7 @@ async function checkForUpdate(){
   }catch(e){}
 }
 checkForUpdate();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 const SB_URL='https://fywtdautqrqzvqmsjkby.supabase.co',SB_KEY='sb_publishable_mjfMSkoeJEBoYgzkjJo4Vg_JoSjI9fC';
 let sb=null,user=null,authChecked=false,loginErr='';
 const dirty=lsGet('lol.dirty',{days:{},weeks:{}});
