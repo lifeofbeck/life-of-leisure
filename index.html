@@ -27,11 +27,12 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
-.statusbar{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#F6EFE3;z-index:30;pointer-events:none}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:30;pointer-events:none;background:#F6EFE3;padding-top:env(safe-area-inset-top,0px)}
+.topbar .awning{margin-inline:0}
 html,body{margin:0}
 html{-webkit-text-size-adjust:100%;background:#F6EFE3 repeating-linear-gradient(90deg,#CFE3DF 0 22px,#F6EFE3 22px 44px)}
 body{background:transparent}
-body{color:var(--ink);font-family:var(--serif);font-size:16px;text-transform:lowercase;padding-inline:16px;padding-block:env(safe-area-inset-top,0px) calc(110px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
+body{color:var(--ink);font-family:var(--serif);font-size:16px;text-transform:lowercase;padding-inline:16px;padding-block:calc(env(safe-area-inset-top,0px) + 18px) calc(110px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
 .wrap{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 button{font:inherit;color:inherit;text-transform:inherit;background:none;border:0;padding:0;cursor:pointer}
 button:focus-visible{outline:2px solid var(--pink);outline-offset:3px;border-radius:4px}
@@ -138,7 +139,7 @@ nav.tabs button.on .it{color:var(--cherry)}
 
 </head>
 <body>
-<div class="statusbar" aria-hidden="true"></div>
+<div class="topbar" aria-hidden="true"><div class="awning"></div></div>
 <div class="wrap" id="app"></div>
 <nav class="tabs" aria-label="Sections"><div class="in" id="tabs"></div></nav>
 
@@ -283,7 +284,7 @@ function header(){
   const qi=quarterInfo(state.tab==='week'?state.week:todayIso());
   const qs='the life of leisure is earned';
   const chipQ='<div class="chip-q caps"><span>Q'+qi.q+' '+qi.year+'</span><span>✦</span><span>Week '+qi.wk+' of '+qi.total+'</span></div>';
-  return '<div class="awning"></div><header class="top"><div class="caps">'+longDate(todayIso())+'</div><div class="wordmark">Life of Leisure</div><div class="tagline">'+esc(qs)+'</div>'+chipQ+'</header>';
+  return '<header class="top"><div class="caps">'+longDate(todayIso())+'</div><div class="wordmark">Life of Leisure</div><div class="tagline">'+esc(qs)+'</div>'+chipQ+'</header>';
 }
 function greeting(){const h=new Date().getHours();return h<12?'Buongiorno':h<17?'Buon pomeriggio':'Buonasera'}
 
@@ -372,7 +373,7 @@ function renderHistory(){
 }
 
 function renderLogin(){
-  return '<div class="awning"></div><header class="top" style="padding-top:40px"><div class="wordmark">life of leisure</div><div class="tagline">the life of leisure is earned</div></header><form class="card login" id="login"><div class="card-t" style="color:'+TEXT.hobby+'">benvenuta</div><label for="login-email" class="caps">email</label><input id="login-email" type="email" autocomplete="username" required><label for="login-pw" class="caps">password</label><input id="login-pw" type="password" autocomplete="current-password" required>'+(loginErr?'<div class="err">'+esc(loginErr)+'</div>':'')+'<button type="submit" class="chip on" style="background:'+COLORS.fitness+';align-self:flex-start">sign in</button><div class="sub">you only have to do this once on this phone.</div></form>';
+  return '<header class="top" style="padding-top:40px"><div class="wordmark">life of leisure</div><div class="tagline">the life of leisure is earned</div></header><form class="card login" id="login"><div class="card-t" style="color:'+TEXT.hobby+'">benvenuta</div><label for="login-email" class="caps">email</label><input id="login-email" type="email" autocomplete="username" required><label for="login-pw" class="caps">password</label><input id="login-pw" type="password" autocomplete="current-password" required>'+(loginErr?'<div class="err">'+esc(loginErr)+'</div>':'')+'<button type="submit" class="chip on" style="background:'+COLORS.fitness+';align-self:flex-start">sign in</button><div class="sub">you only have to do this once on this phone.</div></form>';
 }
 function render(){
   const app=document.getElementById('app');
