@@ -27,12 +27,12 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
-.topbar{position:fixed;top:0;left:0;right:0;z-index:30;pointer-events:none;background:#F6EFE3;padding-top:env(safe-area-inset-top,0px)}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:30;pointer-events:none;height:env(safe-area-inset-top,0px);background:#F6EFE3 repeating-linear-gradient(90deg,#CFE3DF 0 22px,#F6EFE3 22px 44px)}
 .topbar .awning{margin-inline:0}
 html,body{margin:0}
 html{-webkit-text-size-adjust:100%;background:#F6EFE3 repeating-linear-gradient(90deg,#CFE3DF 0 22px,#F6EFE3 22px 44px)}
 body{background:transparent}
-body{color:var(--ink);font-family:var(--serif);font-size:16px;text-transform:lowercase;padding-inline:16px;padding-block:calc(env(safe-area-inset-top,0px) + 18px) calc(110px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
+body{color:var(--ink);font-family:var(--serif);font-size:16px;text-transform:lowercase;padding-inline:16px;padding-block:calc(env(safe-area-inset-top,0px) + 6px) calc(110px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
 .wrap{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 button{font:inherit;color:inherit;text-transform:inherit;background:none;border:0;padding:0;cursor:pointer}
 button:focus-visible{outline:2px solid var(--pink);outline-offset:3px;border-radius:4px}
@@ -139,7 +139,7 @@ nav.tabs button.on .it{color:var(--cherry)}
 
 </head>
 <body>
-<div class="topbar" aria-hidden="true"><div class="awning"></div></div>
+<div class="topbar" aria-hidden="true"></div>
 <div class="wrap" id="app"></div>
 <nav class="tabs" aria-label="Sections"><div class="in" id="tabs"></div></nav>
 
@@ -241,7 +241,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-09-27-3';
+const APP_VERSION='2026-09-27-4';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
