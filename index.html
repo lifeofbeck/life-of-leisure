@@ -27,6 +27,7 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
+.statusbar{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#F6EFE3;z-index:30;pointer-events:none}
 html,body{margin:0}
 html{-webkit-text-size-adjust:100%;background:#F6EFE3 repeating-linear-gradient(90deg,#CFE3DF 0 22px,#F6EFE3 22px 44px)}
 body{background:transparent}
@@ -137,6 +138,7 @@ nav.tabs button.on .it{color:var(--cherry)}
 
 </head>
 <body>
+<div class="statusbar" aria-hidden="true"></div>
 <div class="wrap" id="app"></div>
 <nav class="tabs" aria-label="Sections"><div class="in" id="tabs"></div></nav>
 
