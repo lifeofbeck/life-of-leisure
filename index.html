@@ -122,6 +122,11 @@ nav.tabs button.on .it{color:var(--cherry)}
 .note::placeholder{color:#B39C7E;font-style:italic}
 .diary-list{display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
 .diary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:14px}
+.ai{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-left:2px solid var(--butter);background:var(--cream);border-radius:0 6px 6px 0}
+.ai-t{font-size:13px;color:var(--muted);font-style:italic}
+.ai-t b{font-weight:500;font-style:normal}
+.ai-w{font-size:14px;line-height:1.45}
+.ai-mini{font-style:italic}
 .diary .caps{width:32px}
 .fpill{font-size:12px;border:1px solid;border-radius:999px;padding:1px 8px;font-style:italic}
 .dnote{text-transform:none;flex-basis:100%;padding-left:40px;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
@@ -183,7 +188,7 @@ function lsGet(k,f){try{const v=localStorage.getItem(k);return v?JSON.parse(v):f
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
 const state={
-  days:lsGet('lol.days',{}),weeks:lsGet('lol.weeks',{}),
+  days:lsGet('lol.days',{}),weeks:lsGet('lol.weeks',{}),ai:lsGet('lol.ai',{}),
   tab:lsGet('lol.tab','today'),date:todayIso(),week:mondayOf(todayIso()),
   month:todayIso().slice(0,7),popKey:null,sync:'loading'
 };
@@ -242,7 +247,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-09-28-1';
+const APP_VERSION='2026-09-30-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -282,6 +287,7 @@ async function pull(){
   if(!sb||!user)return;
   try{
     const [d,w]=await Promise.all([fetchAll('days','date,data'),fetchAll('weeks','monday,data')]);
+    try{const a=await fetchAll('food_ai','date,rating,why');state.ai={};a.forEach(r=>{state.ai[r.date]={rating:r.rating,why:r.why}});lsSet('lol.ai',state.ai)}catch(e){console.warn(e)}
     d.forEach(r=>{if(!dirty.days[r.date]&&!pendingDays.has(r.date))state.days[r.date]=r.data||{}});
     w.forEach(r=>{if(!dirty.weeks[r.monday]&&!pendingWeeks.has(r.monday))state.weeks[r.monday]=r.data||{}});
     lsSet('lol.days',state.days);lsSet('lol.weeks',state.weeks);
@@ -312,6 +318,11 @@ function section(title,en,cat,list,date){
 }
 function chip(act,key,label,on,cat,fun){return '<button class="chip'+(on?' on':'')+(fun?' fun':'')+'" data-act="'+act+'" data-k="'+key+'" aria-pressed="'+on+'" style="'+(on?'background:'+COLORS[cat]:'')+'">'+esc(label)+'</button>'}
 
+function aiLine(d){
+  const a=state.ai[d];if(!a||!FOOD_BY[a.rating])return '<div class="ai"><span class="ai-t">claude suggests</span><span class="ai-w">your food rating will show up here at 8:30pm, based on your notes.</span></div>';
+  const f=FOOD_BY[a.rating];
+  return '<div class="ai"><span class="ai-t">claude suggests <b style="color:'+f[3]+'">'+esc(f[1].toLowerCase())+'</b></span><span class="ai-w">'+esc(a.why)+'</span></div>';
+}
 function renderToday(){
   const d=state.date,t=todayIso(),x=day(d),isToday=d===t;
   const sp=SPIRIT[parse(d).getDay()];
@@ -323,7 +334,7 @@ function renderToday(){
   const ws=weekStats(mondayOf(d));
   h+='<section class="card"><div class="card-h"><div><div class="card-t" style="color:'+TEXT.hobby+'">Also today</div><div class="caps">Counts toward weekly goals</div></div></div>';
   h+='<div class="group"><div class="group-h"><span class="box" style="width:30px;height:30px;border:0">'+stamp('fitness',30,1)+'</span><span class="lbl">Workout</span><span class="sub" style="margin-left:auto">'+ws.fit+' of '+ws.targets.fitness+' this week</span></div><div class="chips">'+WORKOUTS.map(o=>chip('workout',o[0],o[1],w.includes(o[0]),'fitness')).join('')+'</div></div>';
-  h+='<div class="group"><div class="group-h"><span class="box" style="width:30px;height:30px;border:0">'+stamp('diet',30,2)+'</span><span class="lbl">La cucina</span><span class="sub" style="margin-left:auto">'+ws.diet+' of '+ws.targets.diet+' this week</span></div><label for="food-note" class="sub">What I ate today</label><textarea id="food-note" class="note" rows="3" placeholder="Breakfast: yogurt bowl. Lunch: chicken salad. Dinner: salmon and rice at home.">'+esc(x.foodNote||'')+'</textarea><div class="chips">'+FOOD.map(f=>'<button class="chip'+(x.food===f[0]?' on':'')+'" data-act="food" data-k="'+f[0]+'" aria-pressed="'+(x.food===f[0])+'" style="'+(x.food===f[0]?'background:'+f[2]:'')+'">'+f[1]+'</button>').join('')+'</div><div class="fun-lbl key"><span><b>fresco</b> = no processed food</span><span><b>balanced</b> = a little processed</span><span><b>could be better</b> = mostly processed</span><span>only fresco days count toward your 5</span></div></div>';
+  h+='<div class="group"><div class="group-h"><span class="box" style="width:30px;height:30px;border:0">'+stamp('diet',30,2)+'</span><span class="lbl">La cucina</span><span class="sub" style="margin-left:auto">'+ws.diet+' of '+ws.targets.diet+' this week</span></div><label for="food-note" class="sub">What I ate today</label><textarea id="food-note" class="note" rows="3" placeholder="Breakfast: yogurt bowl. Lunch: chicken salad. Dinner: salmon and rice at home.">'+esc(x.foodNote||'')+'</textarea><div class="chips">'+FOOD.map(f=>'<button class="chip'+(x.food===f[0]?' on':'')+'" data-act="food" data-k="'+f[0]+'" aria-pressed="'+(x.food===f[0])+'" style="'+(x.food===f[0]?'background:'+f[2]:'')+'">'+f[1]+'</button>').join('')+'</div>'+aiLine(d)+'<div class="fun-lbl key"><span><b>fresco</b> = mostly whole, unprocessed food (home or out)</span><span><b>balanced</b> = a little processed or a treat</span><span><b>could be better</b> = mostly processed or fast food</span><span>only fresco days count toward your 5</span></div></div>';
   h+='<div class="group"><div class="group-h"><span class="box" style="width:30px;height:30px;border:0">'+stamp('hobby',30,3)+'</span><span class="lbl">15 minutes of a hobby</span><span class="sub" style="margin-left:auto">'+ws.hobby+' of '+ws.targets.hobby+'</span></div><div class="chips">'+HOBBY_MAIN.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]),'hobby')).join('')+'</div><div class="fun-lbl">Just for fun</div><div class="chips">'+HOBBY_FUN.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]),'hobby',true)).join('')+'</div></div></section>';
   const n=dayCount(d);
   h+='<div class="quote">'+(posted(d)?'Posted. Every stamp collected.':n===0?'A blank postcard. Let’s fill it.':(DAILY_TOTAL-n)+' more stamp'+(DAILY_TOTAL-n===1?'':'s')+' to post today')+'</div>';
@@ -352,7 +363,7 @@ function renderWeek(){
   const fitNote=s.fit>=s.targets.fitness?'Goal met':s.fit>=4?'Solid week':'';
   h+=postcard('fitness','Movimento','Fitness',s.fit,s.targets.fitness,'<div class="tally"><span>Pilates ×'+s.fitS+'</span><span>Sculpt ×'+s.fitM+'</span><span>10k steps ×'+s.stepsN+'</span></div><div class="sub">10k steps counts toward your 5 on days without pilates or sculpt</div>',fitNote);
   const mp=!!(state.weeks[mon]||{}).mealPrep;
-  const diary=s.days.filter(d=>day(d).food||day(d).foodNote).map(d=>{const x=day(d),f=FOOD_BY[x.food];return '<div class="diary"><span class="caps">'+DOW[parse(d).getDay()]+'</span>'+(f?'<span class="fpill" style="color:'+f[3]+';border-color:'+f[2]+'">'+f[1]+'</span>':'')+(x.foodNote?'<span class="dnote">'+esc(x.foodNote)+'</span>':'')+'</div>'}).join('');
+  const diary=s.days.filter(d=>day(d).food||day(d).foodNote).map(d=>{const x=day(d),f=FOOD_BY[x.food];return '<div class="diary"><span class="caps">'+DOW[parse(d).getDay()]+'</span>'+(f?'<span class="fpill" style="color:'+f[3]+';border-color:'+f[2]+'">'+f[1]+'</span>':'')+(x.foodNote?'<span class="dnote">'+esc(x.foodNote)+'</span>':'')+(state.ai[d]?'<span class="dnote ai-mini">claude: '+esc(FOOD_BY[state.ai[d].rating][1].toLowerCase())+' · '+esc(state.ai[d].why)+'</span>':'')+'</div>'}).join('');
   h+=postcard('diet','La cucina','Fresco days',s.diet,s.targets.diet,'<div class="tally"><span>Fresco ×'+s.diet+'</span><span>Balanced ×'+s.bal+'</span><span>Could be better ×'+s.bet+'</span></div>'+(diary?'<div class="diary-list">'+diary+'</div>':'')+'<button class="mp" data-act="mealprep" aria-pressed="'+mp+'"><span class="box">'+(mp?stamp('diet',30,9):'')+'</span><span><span class="lbl" style="font-size:16px">Meal prep done</span><br><span class="sub">Bonus, doesn’t count against you</span></span></button>',s.met.diet?'Goal met':'');
   const spiritCells=s.days.map(d=>{const on=!!dayChecks(d).spirit;return '<div class="wd" title="'+esc(SPIRIT[parse(d).getDay()])+'"><div class="cell" style="border-style:'+(on?'solid':'dashed')+';border-color:'+(on?'transparent':'')+'">'+(on?stamp('spirit',32,seedOf(d)):'')+'</div>'+DOW[parse(d).getDay()].charAt(0)+'</div>'}).join('');
   h+=postcard('spirit','Spirituale','Daily spiritual activity',s.spirit,s.targets.spirit,'<div class="week-dots">'+spiritCells+'</div>',s.met.spirit?'Goal met':'');
