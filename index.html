@@ -6,9 +6,9 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Vita">
-<meta name="theme-color" content="#F7F3EC">
+<meta name="theme-color" content="#2B2622">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="vita-icon-180.png">
 <link rel="icon" type="image/png" href="vita-icon-192.png">
@@ -27,12 +27,12 @@
 html,body{margin:0}
 html{-webkit-text-size-adjust:100%;background:var(--bg)}
 body{background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.35;padding-inline:22px;padding-block:calc(env(safe-area-inset-top,0px) + 22px) calc(96px + env(safe-area-inset-bottom,0px));text-transform:lowercase;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-.topbar{position:fixed;top:0;left:0;right:0;z-index:30;pointer-events:none;background:var(--bg);height:env(safe-area-inset-top,0px)}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:30;pointer-events:none;background:var(--ink);height:env(safe-area-inset-top,0px)}
 .wrap{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:30px}
 button{font:inherit;color:inherit;text-transform:inherit;background:none;border:0;padding:0;cursor:pointer}
 button:focus-visible{outline:1px solid var(--accent);outline-offset:3px}
 .caps{font-size:10.5px;letter-spacing:.24em;color:var(--muted);font-weight:500;text-transform:uppercase}
-header.top{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;background:var(--ink);color:var(--bg);padding:22px 16px 20px;border-radius:3px}
+header.top{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;background:var(--ink);color:var(--bg);padding:18px 16px 22px;margin:-22px -22px 0}
 header.top .caps{color:#C9BFB3}
 header.top .tagline{color:#E3A79F}
 .wordmark{font-size:30px;font-style:italic;font-weight:500;letter-spacing:.01em;line-height:1.1;margin-top:2px}
@@ -230,7 +230,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-06-2';
+const APP_VERSION='2026-10-06-3';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
