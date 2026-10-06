@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Vita">
 <meta name="theme-color" content="#2B2622">
 <link rel="manifest" href="manifest.json">
@@ -231,7 +231,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-06-7';
+const APP_VERSION='2026-10-06-8';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -243,6 +243,7 @@ async function checkForUpdate(){
   }catch(e){}
 }
 checkForUpdate();
+(function(){try{const pr=document.createElement('div');pr.style.cssText='position:fixed;top:0;height:env(safe-area-inset-top,0px)';document.body.appendChild(pr);const h=pr.getBoundingClientRect().height;pr.remove();if(h<1&&(navigator.standalone||matchMedia('(display-mode: standalone)').matches)){document.querySelector('.topbar').style.height='54px';document.body.style.paddingTop='76px'}}catch(e){}})();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 const SB_URL='https://fywtdautqrqzvqmsjkby.supabase.co',SB_KEY='sb_publishable_mjfMSkoeJEBoYgzkjJo4Vg_JoSjI9fC';
 let sb=null,user=null,authChecked=false,loginErr='';let cfgDirty=lsGet('lol.cfgDirty',false);
@@ -285,7 +286,9 @@ function setSync(s){state.sync=s;const el=document.getElementById('sync');if(el)
 function syncText(){return{local:'saving on this device',loading:'syncing…',saved:'saved ✦ synced',offline:'offline ✦ saved on your phone, will sync when you’re back online',error:'couldn’t sync just now. it will try again when you reopen the app.'}[state.sync]||''}
 
 /* ---------- habits (built-in + your own) ---------- */
-function cfg(){const c=state.cfg||{};c.custom=c.custom||{};c.custom.morning=c.custom.morning||[];c.custom.night=c.custom.night||[];c.hidden=c.hidden||[];return c}
+function cfg(){const c=state.cfg||{};c.custom=c.custom||{};c.custom.morning=c.custom.morning||[];c.custom.night=c.custom.night||[];c.hidden=c.hidden||[];c.custom.hobbies=c.custom.hobbies||[];return c}
+function hobbyList(){const c=cfg();return [...HOBBY_MAIN,...HOBBY_FUN].filter(h=>!c.hidden.includes(h[0])).concat(c.custom.hobbies.map(x=>[x.k,x.label]))}
+function hobbyName(k){const f=[...HOBBY_MAIN,...HOBBY_FUN].find(h=>h[0]===k)||cfg().custom.hobbies.map(x=>[x.k,x.label]).find(h=>h[0]===k);return f?f[1]:k}
 function list(sec){const c=cfg(),base=sec==='morning'?MORNING:NIGHT;return base.filter(h=>!c.hidden.includes(h[0])).concat(c.custom[sec].map(x=>[x.k,x.label]))}
 function saveCfg(){lsSet('lol.cfg',state.cfg);cfgDirty=true;lsSet('lol.cfgDirty',true);flushCfg()}
 async function flushCfg(){
@@ -341,7 +344,13 @@ function renderToday(){
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">also today</div><div class="caps sec-s">weekly goals</div></div></div>';
   h+='<div class="group"><div class="group-h"><span class="lbl">movimento</span><span class="sub">'+ws.fit+' of '+ws.targets.fitness+' this week</span></div><div class="chips">'+WORKOUTS.map(o=>chip('workout',o[0],o[1],w.includes(o[0]))).join('')+'</div></div>';
   h+='<div class="group"><div class="group-h"><span class="lbl">la cucina</span><span class="sub">'+ws.diet+' of '+ws.targets.diet+' fresco</span></div><div class="chips">'+FOOD.map(f=>chip('food',f[0],f[1],x.food===f[0])).join('')+'</div><textarea id="food-note" class="note" rows="3" aria-label="what i ate today" placeholder="what did you eat today? chicken and sweet potatoes, steak bowl, strawberries">'+esc(x.foodNote||'')+'</textarea>'+aiLine(d)+'</div>';
-  h+='<div class="group"><div class="group-h"><span class="lbl">passatempi</span><span class="sub">'+ws.hobby+' of '+ws.targets.hobby+' this week</span></div><div class="chips">'+HOBBY_MAIN.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div><div class="fun-lbl">just for fun</div><div class="chips">'+HOBBY_FUN.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div></div></section>';
+  {const ed=state.edit==='hobbies',HL=hobbyList();
+  h+='<div class="group"><div class="group-h"><span class="lbl">passatempi</span><span class="sub">'+ws.hobby+' of '+ws.targets.hobby+' this week · <button style="color:var(--accent);font-style:normal;letter-spacing:.2em;font-size:10.5px;text-transform:uppercase" data-act="edit" data-sec="hobbies">'+(ed?'done':'edit')+'</button></span></div>';
+  if(ed){h+=HL.map(o=>editRow(o[0],o[1],'hobbies')).join('')+'<form data-sec="hobbies" id="add-hobbies" style="display:flex;gap:10px;align-items:center"><input id="new-hobbies" class="note" style="min-height:0;flex:1" placeholder="pottery" autocomplete="off" aria-label="add a hobby"><button type="submit" class="chip on">add</button></form>';
+    const hid=cfg().hidden.filter(k=>[...HOBBY_MAIN,...HOBBY_FUN].some(b=>b[0]===k));
+    if(hid.length)h+='<div class="fun-lbl">removed: '+hid.map(k=>'<button style="text-decoration:underline" data-act="restore" data-k="'+k+'">'+esc(hobbyName(k).toLowerCase())+'</button>').join(', ')+' (tap to bring back)</div>';}
+  else h+='<div class="chips">'+HL.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div>';
+  h+='</div></section>';}
   const n=dayCount(d),T=dailyTotal();
   h+='<div class="quote">'+(posted(d)?'every stamp collected. buonanotte.':n===0?'a blank page. begin.':(T-n)+' left today')+'</div>';
   return h;
@@ -368,7 +377,7 @@ function renderWeek(){
   const diary=s.days.filter(d=>day(d).food||day(d).foodNote).map(d=>{const x=day(d),f=FOOD_BY[x.food];return '<div class="diary"><span class="caps">'+DOW[parse(d).getDay()]+'</span>'+(f?'<span class="fpill">'+f[1].toLowerCase()+'</span>':'')+(x.foodNote?'<span class="dnote">'+esc(x.foodNote)+'</span>':'')+(state.ai[d]?'<span class="dnote ai-mini">claude: '+esc(FOOD_BY[state.ai[d].rating][1].toLowerCase())+'. '+esc(state.ai[d].why)+'</span>':'')+'</div>'}).join('');
   h+=stat('la cucina','fresco days',s.diet,5,'<div class="tally">fresco '+s.diet+' · balanced '+s.bal+' · could be better '+s.bet+'</div>'+(diary?'<div class="diary-list">'+diary+'</div>':'')+'<button class="mp" data-act="mealprep" aria-pressed="'+mp+'"><span class="mark'+(mp?' on':'')+'">'+CHECK+'</span><span><span class="lbl">meal prep done</span><br><span class="sub">a bonus, never counts against you</span></span></button>',s.met.diet?'goal met':'');
   h+=stat('spirituale','daily spiritual activity',s.spirit,7,dotRow(d=>dayChecks(d).spirit?1:0),s.met.spirit?'goal met':'');
-  const hob=Object.entries(s.hob).map(([k,v])=>(HOBBY_NAME[k]||k).toLowerCase()+' '+v).join(' · ');
+  const hob=Object.entries(s.hob).map(([k,v])=>hobbyName(k).toLowerCase()+' '+v).join(' · ');
   h+=stat('passatempi','hobby days',s.hobby,5,'<div class="tally">'+(hob||'none yet. fifteen minutes counts.')+'</div>',s.met.hobby?'goal met':'');
   const frac=sec=>d=>{const c=dayChecks(d),L=list(sec);return L.length?L.filter(x=>c[x[0]]).length/L.length:0};
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">routines</div><div class="caps sec-s">mattina and sera</div></div></div><div class="stat"><span class="lbl" style="font-style:italic">mattina</span><span class="sub">'+s.morPct+'% so far</span></div>'+dotRow(frac('morning'))+'<div class="stat"><span class="lbl" style="font-style:italic">sera</span><span class="sub">'+s.nigPct+'% so far</span></div>'+dotRow(frac('night'))+'</section>';
