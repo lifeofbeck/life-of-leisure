@@ -231,7 +231,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-06-8';
+const APP_VERSION='2026-10-06-9';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -375,7 +375,7 @@ function renderWeek(){
   h+=stat('movimento','fitness',s.fit,5,'<div class="tally">pilates '+s.fitS+' · sculpt '+s.fitM+' · 10k steps '+s.stepsN+'</div>',s.fit>=5?'goal met':s.fit>=4?'solid week':'');
   const mp=!!(state.weeks[mon]||{}).mealPrep;
   const diary=s.days.filter(d=>day(d).food||day(d).foodNote).map(d=>{const x=day(d),f=FOOD_BY[x.food];return '<div class="diary"><span class="caps">'+DOW[parse(d).getDay()]+'</span>'+(f?'<span class="fpill">'+f[1].toLowerCase()+'</span>':'')+(x.foodNote?'<span class="dnote">'+esc(x.foodNote)+'</span>':'')+(state.ai[d]?'<span class="dnote ai-mini">claude: '+esc(FOOD_BY[state.ai[d].rating][1].toLowerCase())+'. '+esc(state.ai[d].why)+'</span>':'')+'</div>'}).join('');
-  h+=stat('la cucina','fresco days',s.diet,5,'<div class="tally">fresco '+s.diet+' · balanced '+s.bal+' · could be better '+s.bet+'</div>'+(diary?'<div class="diary-list">'+diary+'</div>':'')+'<button class="mp" data-act="mealprep" aria-pressed="'+mp+'"><span class="mark'+(mp?' on':'')+'">'+CHECK+'</span><span><span class="lbl">meal prep done</span><br><span class="sub">a bonus, never counts against you</span></span></button>',s.met.diet?'goal met':'');
+  h+=stat('la cucina','fresco days',s.diet,5,'<div class="tally">fresco '+s.diet+' · balanced '+s.bal+' · could be better '+s.bet+'</div>'+(diary?'<div class="diary-list">'+diary+'</div>':''),s.met.diet?'goal met':'');
   h+=stat('spirituale','daily spiritual activity',s.spirit,7,dotRow(d=>dayChecks(d).spirit?1:0),s.met.spirit?'goal met':'');
   const hob=Object.entries(s.hob).map(([k,v])=>hobbyName(k).toLowerCase()+' '+v).join(' · ');
   h+=stat('passatempi','hobby days',s.hobby,5,'<div class="tally">'+(hob||'none yet. fifteen minutes counts.')+'</div>',s.met.hobby?'goal met':'');
@@ -397,7 +397,7 @@ function renderHistory(){
   const weeks=[];let w=mondayOf(t);const stop=[mondayOf(APP_START),mondayOf(t)].sort()[0];
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">weekly scorecards</div><div class="caps sec-s">tap to open</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk),mm=Object.values(s.met).filter(Boolean).length;
-    return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span><span class="caps">'+mm+' / 4 goals</span></div><div class="sc-row">fitness '+s.fit+'/5 · fresco '+s.diet+'/5 · spiritual '+s.spirit+'/7 · hobbies '+s.hobby+'/5 · posted '+s.postedDays+'/7</div></button>'}).join('')+'</section>';
+    return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span><span class="caps">'+mm+' / 4 goals</span></div><div class="sc-row">fitness '+s.fit+'/5 · fresco '+s.diet+'/5 · spiritual '+s.spirit+'/7 · hobbies '+s.hobby+'/5</div></button>'}).join('')+'</section>';
   h+='<section class="sec about"><div class="sec-h"><div><div class="sec-t">why life of leisure</div><div class="caps sec-s">a note to future me</div></div></div><p>the ancient greek word for leisure, <i>scholē</i>, is where the word “school” comes from. leisure was never laziness. it was time for what matters most: learning, creating, worship, family, and real rest.</p><p class="aristotle">“we are busy so that we may have leisure.”<br><span class="sub">aristotle</span></p><p>the routines, the workouts, and the clean eating are the busy part. what they buy is the leisure: time for prayer and my spiritual routine, drumming, journaling and bedazzling instead of scrolling, a body that feels good, and slow mornings where i feel put together.</p><p class="end">the life of leisure is earned.</p></section>';
   return h;
 }
