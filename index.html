@@ -32,16 +32,19 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:18
 button{font:inherit;color:inherit;text-transform:inherit;background:none;border:0;padding:0;cursor:pointer}
 button:focus-visible{outline:1px solid var(--accent);outline-offset:3px}
 .caps{font-size:10.5px;letter-spacing:.24em;color:var(--muted);font-weight:500;text-transform:uppercase}
-header.top{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding-top:6px}
+header.top{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;background:var(--ink);color:var(--bg);padding:22px 16px 20px;border-radius:3px}
+header.top .caps{color:#C9BFB3}
+header.top .tagline{color:#E3A79F}
 .wordmark{font-size:30px;font-style:italic;font-weight:500;letter-spacing:.01em;line-height:1.1;margin-top:2px}
 .tagline{color:var(--accent)}
 .qline{color:var(--muted);margin-top:6px}
 .sec{display:flex;flex-direction:column}
-.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
-.sec-t{font-size:22px;font-style:italic;font-weight:500;line-height:1}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:3px double var(--ink)}
+.sec-h .caps{color:var(--ink)}
+.sec-t{font-size:23px;font-style:italic;font-weight:500;line-height:1;color:var(--accent)}
 .sec-s{margin-top:5px}
 .daybar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.greet{font-size:21px;font-style:italic;text-align:center}
+.greet{font-size:21px;font-style:italic;font-weight:500;text-align:center}
 .navbtn{width:34px;height:34px;display:grid;place-items:center;font-size:20px;color:var(--muted)}
 .navbtn[disabled]{opacity:.25;cursor:default}
 .today-link{font-size:13px;color:var(--accent);text-decoration:underline;text-underline-offset:3px;margin-top:2px}
@@ -49,7 +52,7 @@ header.top{display:flex;flex-direction:column;align-items:center;gap:4px;text-al
 .mark{width:18px;height:18px;flex-shrink:0;border-radius:50%;border:1px solid var(--soft);display:grid;place-items:center;transition:background .2s,border-color .2s}
 .row.on .mark,.mark.on{background:var(--accent);border-color:var(--accent)}
 .mark svg{opacity:0}.row.on .mark svg,.mark.on svg{opacity:1}
-.lbl{font-size:18px}
+.lbl{font-size:18px;font-weight:500}
 .row.on .lbl{color:var(--muted)}
 .sub{font-size:14px;color:var(--muted);font-style:italic}
 .group{padding:14px 0 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
@@ -227,7 +230,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-06-1';
+const APP_VERSION='2026-10-06-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
