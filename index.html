@@ -231,7 +231,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-06-6';
+const APP_VERSION='2026-10-06-7';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -340,7 +340,7 @@ function renderToday(){
   h+=section('sera','evening','night',d);
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">also today</div><div class="caps sec-s">weekly goals</div></div></div>';
   h+='<div class="group"><div class="group-h"><span class="lbl">movimento</span><span class="sub">'+ws.fit+' of '+ws.targets.fitness+' this week</span></div><div class="chips">'+WORKOUTS.map(o=>chip('workout',o[0],o[1],w.includes(o[0]))).join('')+'</div></div>';
-  h+='<div class="group"><div class="group-h"><span class="lbl">la cucina</span><span class="sub">'+ws.diet+' of '+ws.targets.diet+' fresco</span></div><textarea id="food-note" class="note" rows="3" aria-label="what i ate today" placeholder="what did you eat today? chicken and sweet potatoes, steak bowl, strawberries">'+esc(x.foodNote||'')+'</textarea>'+aiLine(d)+'<div class="chips">'+FOOD.map(f=>chip('food',f[0],f[1],x.food===f[0])).join('')+'</div></div>';
+  h+='<div class="group"><div class="group-h"><span class="lbl">la cucina</span><span class="sub">'+ws.diet+' of '+ws.targets.diet+' fresco</span></div><div class="chips">'+FOOD.map(f=>chip('food',f[0],f[1],x.food===f[0])).join('')+'</div><textarea id="food-note" class="note" rows="3" aria-label="what i ate today" placeholder="what did you eat today? chicken and sweet potatoes, steak bowl, strawberries">'+esc(x.foodNote||'')+'</textarea>'+aiLine(d)+'</div>';
   h+='<div class="group"><div class="group-h"><span class="lbl">passatempi</span><span class="sub">'+ws.hobby+' of '+ws.targets.hobby+' this week</span></div><div class="chips">'+HOBBY_MAIN.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div><div class="fun-lbl">just for fun</div><div class="chips">'+HOBBY_FUN.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div></div></section>';
   const n=dayCount(d),T=dailyTotal();
   h+='<div class="quote">'+(posted(d)?'every stamp collected. buonanotte.':n===0?'a blank page. begin.':(T-n)+' left today')+'</div>';
