@@ -79,7 +79,7 @@ header.top .tagline{color:#E3A79F}
 .weeknav{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .gazette{text-align:center;padding:16px 0 18px;border-top:3px double var(--ink);border-bottom:1px solid var(--ink)}
 .gz-top{display:flex;justify-content:space-between}
-.gz-name{font-size:28px;font-style:italic;font-weight:500;margin:10px 0 8px}
+.gz-name{font-size:28px;font-style:italic;font-weight:500;margin:10px 0 0}
 .gz-head{font-size:21px;line-height:1.25;text-wrap:balance}
 .gz-deck{font-size:15px;color:var(--muted);font-style:italic;margin-top:6px}
 .stat{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-top:12px}
@@ -115,9 +115,13 @@ header.top .tagline{color:#E3A79F}
 .fbar i{display:block;height:100%}
 .sc{display:flex;flex-direction:column;gap:2px;padding:12px 0;border-bottom:1px solid var(--line);text-align:left;width:100%}
 .sc-row{font-size:15px;color:var(--muted);font-variant-numeric:lining-nums tabular-nums}
-.about p{margin:10px 0 0;font-size:17px;line-height:1.55;max-width:62ch}
-.about .aristotle{font-style:italic;font-size:19px;text-align:center}
-.about .end{font-style:italic;text-align:center;color:var(--accent)}
+.about-box{background:var(--ink);color:var(--bg);padding:24px 20px 22px;border-radius:3px;margin-top:6px}
+.about-box .sec-t{color:#E3A79F}
+.about-box .caps{color:#C9BFB3}
+.about-box p{margin:14px 0 0;font-size:17px;line-height:1.55}
+.about-box .aristotle{font-style:italic;font-size:19px;text-align:center;margin-top:18px}
+.about-box .who{font-size:14px;color:#C9BFB3}
+.about-box .end{font-style:italic;text-align:center;color:#E3A79F;margin-top:18px}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;padding:10px 22px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:5}
 nav.tabs .in{display:flex;max-width:460px;width:100%;justify-content:space-around}
 nav.tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 10px}
@@ -231,7 +235,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-06-9';
+const APP_VERSION='2026-10-06-10';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -371,7 +375,7 @@ function renderWeek(){
   const mon=state.week,s=weekStats(mon),t=todayIso(),inProgress=s.days.includes(t),qi=quarterInfo(mon),[hl,deck]=gazetteHead(s,inProgress);
   const range=nice(mon).split(', ')[1].toLowerCase()+' – '+nice(add(mon,6)).split(', ')[1].toLowerCase();
   let h='<div class="weeknav"><button class="navbtn" data-act="week" data-d="-7" aria-label="previous week">‹</button><div class="caps">week of '+range+'</div><button class="navbtn" data-act="week" data-d="7" aria-label="next week"'+(add(mon,7)>t?' disabled':'')+'>›</button></div>';
-  h+='<section class="gazette"><div class="gz-top caps"><span>vol. q'+qi.q+'</span><span>no. '+qi.wk+'</span></div><div class="gz-name">the leisure gazette</div><div class="gz-head">'+hl+'</div><div class="gz-deck">'+deck+'</div><div class="caps" style="margin-top:10px">'+s.postedDays+' of 7 days posted</div></section>';
+  h+='<section class="gazette"><div class="gz-top caps"><span>vol. q'+qi.q+'</span><span>no. '+qi.wk+'</span></div><div class="gz-name">the leisure gazette</div></section>';
   h+=stat('movimento','fitness',s.fit,5,'<div class="tally">pilates '+s.fitS+' · sculpt '+s.fitM+' · 10k steps '+s.stepsN+'</div>',s.fit>=5?'goal met':s.fit>=4?'solid week':'');
   const mp=!!(state.weeks[mon]||{}).mealPrep;
   const diary=s.days.filter(d=>day(d).food||day(d).foodNote).map(d=>{const x=day(d),f=FOOD_BY[x.food];return '<div class="diary"><span class="caps">'+DOW[parse(d).getDay()]+'</span>'+(f?'<span class="fpill">'+f[1].toLowerCase()+'</span>':'')+(x.foodNote?'<span class="dnote">'+esc(x.foodNote)+'</span>':'')+(state.ai[d]?'<span class="dnote ai-mini">claude: '+esc(FOOD_BY[state.ai[d].rating][1].toLowerCase())+'. '+esc(state.ai[d].why)+'</span>':'')+'</div>'}).join('');
@@ -398,7 +402,7 @@ function renderHistory(){
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">weekly scorecards</div><div class="caps sec-s">tap to open</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk),mm=Object.values(s.met).filter(Boolean).length;
     return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span><span class="caps">'+mm+' / 4 goals</span></div><div class="sc-row">fitness '+s.fit+'/5 · fresco '+s.diet+'/5 · spiritual '+s.spirit+'/7 · hobbies '+s.hobby+'/5</div></button>'}).join('')+'</section>';
-  h+='<section class="sec about"><div class="sec-h"><div><div class="sec-t">why life of leisure</div><div class="caps sec-s">a note to future me</div></div></div><p>the ancient greek word for leisure, <i>scholē</i>, is where the word “school” comes from. leisure was never laziness. it was time for what matters most: learning, creating, worship, family, and real rest.</p><p class="aristotle">“we are busy so that we may have leisure.”<br><span class="sub">aristotle</span></p><p>the routines, the workouts, and the clean eating are the busy part. what they buy is the leisure: time for prayer and my spiritual routine, drumming, journaling and bedazzling instead of scrolling, a body that feels good, and slow mornings where i feel put together.</p><p class="end">the life of leisure is earned.</p></section>';
+  h+='<section class="about-box"><div class="sec-t">why life of leisure</div><div class="caps sec-s">a note to future me</div><p>the ancient greek word for leisure, <i>scholē</i>, is where the word “school” comes from. leisure was never laziness. it was time for what matters most: learning, creating, worship, family, and real rest.</p><p class="aristotle">“we are busy so that we may have leisure.”<br><span class="who">aristotle</span></p><p>the routines, the workouts, and the clean eating are the busy part. what they buy is the leisure: time for prayer and my spiritual routine, drumming, journaling and bedazzling instead of scrolling, a body that feels good, and slow mornings where i feel put together.</p><p class="end">the life of leisure is earned.</p></section>';
   return h;
 }
 function renderLogin(){
