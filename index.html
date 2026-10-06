@@ -67,10 +67,11 @@ header.top .tagline{color:#E3A79F}
 .note{text-transform:none;width:100%;font:inherit;font-size:16px;line-height:1.5;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--soft);padding:6px 0 8px;resize:vertical;min-height:70px;border-radius:0}
 .note:focus{outline:none;border-bottom-color:var(--accent)}
 .note::placeholder{color:var(--soft);font-style:italic}
-.ai{display:flex;flex-direction:column;gap:2px;padding:2px 0 2px 12px;border-left:1px solid var(--accent)}
-.ai-t{font-size:13px;color:var(--muted);font-style:italic}
-.ai-t b{font-weight:500;font-style:normal;color:var(--accent)}
-.ai-w{font-size:16px;line-height:1.4}
+.ai{display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--ink);color:var(--bg);border-radius:3px}
+.ai.empty{align-items:center}
+.ai.empty .ai-w{font-style:italic;color:#C9BFB3;font-size:15px}
+.ai-r{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#E3A79F}
+.ai-w{font-size:16px;line-height:1.45}
 .quote{text-align:center;font-style:italic;font-size:16px;color:var(--muted)}
 .postmark{display:flex;justify-content:center;margin-top:-10px}
 .foot{text-align:center;font-size:13px;color:var(--muted);font-style:italic}
@@ -230,7 +231,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-06-5';
+const APP_VERSION='2026-10-06-6';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -322,8 +323,9 @@ function section(title,en,sec,date){
 }
 function chip(act,key,label,on){return '<button class="chip'+(on?' on':'')+'" data-act="'+act+'" data-k="'+key+'" aria-pressed="'+on+'">'+esc(label)+'</button>'}
 function aiLine(d){
-  const a=state.ai[d];if(!a||!FOOD_BY[a.rating])return '<div class="ai"><span class="ai-t">claude suggests</span><span class="ai-w">your rating shows up here at 8:30pm, based on your notes.</span></div>';
-  return '<div class="ai"><span class="ai-t">claude suggests <b>'+esc(FOOD_BY[a.rating][1].toLowerCase())+'</b></span><span class="ai-w">'+esc(a.why)+'</span></div>';
+  const a=state.ai[d];
+  if(!a||!FOOD_BY[a.rating])return '<div class="ai empty"><span class="ai-w">updates at 8:30</span></div>';
+  return '<div class="ai"><span class="ai-r">'+esc(FOOD_BY[a.rating][1].toLowerCase())+'</span><span class="ai-w">'+esc(a.why)+'</span></div>';
 }
 function postmark(date){
   const d=parse(date),t=(MON[d.getMonth()]+' '+d.getDate()).toLowerCase();
@@ -338,7 +340,7 @@ function renderToday(){
   h+=section('sera','evening','night',d);
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">also today</div><div class="caps sec-s">weekly goals</div></div></div>';
   h+='<div class="group"><div class="group-h"><span class="lbl">movimento</span><span class="sub">'+ws.fit+' of '+ws.targets.fitness+' this week</span></div><div class="chips">'+WORKOUTS.map(o=>chip('workout',o[0],o[1],w.includes(o[0]))).join('')+'</div></div>';
-  h+='<div class="group"><div class="group-h"><span class="lbl">la cucina</span><span class="sub">'+ws.diet+' of '+ws.targets.diet+' fresco</span></div><textarea id="food-note" class="note" rows="3" aria-label="what i ate today" placeholder="what did you eat today? chicken and sweet potatoes, steak bowl, strawberries">'+esc(x.foodNote||'')+'</textarea>'+aiLine(d)+'<div class="chips">'+FOOD.map(f=>chip('food',f[0],f[1],x.food===f[0])).join('')+'</div><div class="fun-lbl key"><span><b>fresco</b> · mostly whole, unprocessed food, home or out</span><span><b>balanced</b> · a little processed, or a treat</span><span><b>could be better</b> · mostly processed or fast food</span></div></div>';
+  h+='<div class="group"><div class="group-h"><span class="lbl">la cucina</span><span class="sub">'+ws.diet+' of '+ws.targets.diet+' fresco</span></div><textarea id="food-note" class="note" rows="3" aria-label="what i ate today" placeholder="what did you eat today? chicken and sweet potatoes, steak bowl, strawberries">'+esc(x.foodNote||'')+'</textarea>'+aiLine(d)+'<div class="chips">'+FOOD.map(f=>chip('food',f[0],f[1],x.food===f[0])).join('')+'</div></div>';
   h+='<div class="group"><div class="group-h"><span class="lbl">passatempi</span><span class="sub">'+ws.hobby+' of '+ws.targets.hobby+' this week</span></div><div class="chips">'+HOBBY_MAIN.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div><div class="fun-lbl">just for fun</div><div class="chips">'+HOBBY_FUN.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div></div></section>';
   const n=dayCount(d),T=dailyTotal();
   h+='<div class="quote">'+(posted(d)?'every stamp collected. buonanotte.':n===0?'a blank page. begin.':(T-n)+' left today')+'</div>';
