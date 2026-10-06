@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Vita">
 <meta name="theme-color" content="#2B2622">
 <link rel="manifest" href="manifest.json">
@@ -230,7 +230,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-06-4';
+const APP_VERSION='2026-10-06-5';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
