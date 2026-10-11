@@ -152,7 +152,7 @@ nav.tabs button.on .en{color:var(--accent)}
 <script src="supabase.js"></script>
 <script>
 (function(){
-const APP_START='2026-09-28';
+const APP_START='2026-10-12';
 const COLORS={morning:'#E8742C',night:'#3B5B9A',spirit:'#1F8A8A',fitness:'#C8322F',diet:'#D9A520',hobby:'#D9486F'};
 const TEXT={morning:'#9A4613',night:'#2C4577',spirit:'#155F5F',fitness:'#9E2522',diet:'#7F5F0D',hobby:'#A5304F'};
 const MOTIF={morning:'sun',night:'moon',spirit:'olive',fitness:'star',diet:'lemon',hobby:'heart'};
@@ -243,7 +243,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-11-1';
+const APP_VERSION='2026-10-11-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -286,8 +286,8 @@ async function pull(){
     const [d,w]=await Promise.all([fetchAll('days','date,data'),fetchAll('weeks','monday,data')]);
     try{if(!cfgDirty){const {data:st,error:se}=await sb.from('settings').select('data').maybeSingle();if(!se&&st){state.cfg=st.data||{};lsSet('lol.cfg',state.cfg)}}}catch(e){console.warn(e)}
     try{const a=await fetchAll('food_ai','date,rating,why');state.ai={};a.forEach(r=>{state.ai[r.date]={rating:r.rating,why:r.why}});lsSet('lol.ai',state.ai)}catch(e){console.warn(e)}
-    d.forEach(r=>{if(!dirty.days[r.date]&&!pendingDays.has(r.date))state.days[r.date]=r.data||{}});
-    w.forEach(r=>{if(!dirty.weeks[r.monday]&&!pendingWeeks.has(r.monday))state.weeks[r.monday]=r.data||{}});
+    {const nd={};Object.keys(state.days).forEach(k=>{if(dirty.days[k]||pendingDays.has(k))nd[k]=state.days[k]});d.forEach(r=>{if(!nd[r.date])nd[r.date]=r.data||{}});state.days=nd;}
+    {const nw={};Object.keys(state.weeks).forEach(k=>{if(dirty.weeks[k]||pendingWeeks.has(k))nw[k]=state.weeks[k]});w.forEach(r=>{if(!nw[r.monday])nw[r.monday]=r.data||{}});state.weeks=nw;}
     lsSet('lol.days',state.days);lsSet('lol.weeks',state.weeks);
     if(!Object.keys(dirty.days).length&&!Object.keys(dirty.weeks).length)state.sync='saved';
     safeRender();
@@ -364,7 +364,7 @@ function renderToday(){
   else h+='<div class="chips">'+HL.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div>';
   h+='</div></section>';}
   const n=dayCount(d),T=dailyTotal();
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">il corpo</div><div class="caps sec-s">optional · log anytime</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="—" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">il corpo</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="—" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
   h+='<div class="quote">'+(posted(d)?'every stamp collected. buonanotte.':n===0?'a blank page. begin.':(T-n)+' left today')+'</div>';
   return h;
 }
