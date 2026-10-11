@@ -243,7 +243,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-11-3';
+const APP_VERSION='2026-10-11-4';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -363,7 +363,7 @@ function postmark(date){
   return '<svg width="74" height="74" viewBox="0 0 74 74" aria-hidden="true" style="transform:rotate(-8deg)"><circle cx="37" cy="37" r="31" fill="none" stroke="#9E3B32" stroke-width="1.2"/><circle cx="37" cy="37" r="26" fill="none" stroke="#9E3B32" stroke-width=".6"/><text x="37" y="35" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="10" letter-spacing="2.5" fill="#9E3B32">POSTED</text><text x="37" y="47" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-style="italic" font-size="11" fill="#9E3B32">'+t+'</text></svg>';
 }
 function freshCard(){
-  if(state.fresh==='done')return '<section class="about-box" style="text-align:center"><div class="sec-t">a clean page</div><p style="margin-top:8px">everything before today is cleared. your weigh-ins are safe. tomorrow begins.</p></section>';
+  if(state.fresh==='done')return '';
   if(state.fresh==='error')return '<section class="about-box" style="text-align:center"><div class="sec-t">that didn’t go through</div><p style="margin-top:8px">check your connection and try again.</p><button class="chip" style="margin-top:12px;color:var(--bg);border-color:#C9BFB3" data-act="fresh">try again</button></section>';
   if(!needsFresh())return '';
   if(state.fresh==='working')return '<section class="about-box" style="text-align:center"><p>clearing…</p></section>';
@@ -440,9 +440,9 @@ function renderHistory(){
      h+='<div class="tally" style="padding-top:8px">'+wd.length+' weigh-in'+(wd.length>1?'s':'')+(wd.length>1?' · '+(diff>0?'+':'')+diff+' lbs since '+nice(wd[0]).split(', ')[1].toLowerCase():'')+'</div>';
      h+=wd.slice().reverse().map(d=>{const x=day(d);return '<button class="wrow" data-act="open" data-date="'+d+'"><span class="caps" style="width:74px;text-align:left">'+nice(d).split(', ')[0]+' '+(+d.slice(8))+'</span><span class="lbl">'+esc(x.weight)+'</span><span class="sub" style="margin-left:auto">'+(x.cycle||'')+'</span></button>'}).join('');}
    h+='</section>';}
-  const weeks=[];let w=mondayOf(t);const stop=[mondayOf(APP_START),mondayOf(t)].sort()[0];
+  const weeks=[];let w=mondayOf(t);const stop=mondayOf(APP_START);
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">weekly scorecards</div><div class="caps sec-s">tap to open</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk),mm=Object.values(s.met).filter(Boolean).length;
+  if(weeks.length)h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">weekly scorecards</div><div class="caps sec-s">tap to open</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk),mm=Object.values(s.met).filter(Boolean).length;
     return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span><span class="caps">'+mm+' / 4 goals</span></div><div class="sc-row">fitness '+s.fit+'/5 · fresco '+s.diet+'/5 · spiritual '+s.spirit+'/7 · hobbies '+s.hobby+'/5</div></button>'}).join('')+'</section>';
   h+='<section class="about-box"><div class="sec-t">why life of leisure</div><div class="caps sec-s">a note to future me</div><p>the ancient greek word for leisure, <i>scholē</i>, is where the word “school” comes from. leisure was never laziness. it was time for what matters most: learning, creating, worship, family, and real rest.</p><p class="aristotle">“we are busy so that we may have leisure.”<br><span class="who">aristotle</span></p><p>the routines, the workouts, and the clean eating are the busy part. what they buy is the leisure: time for prayer and my spiritual routine, drumming, journaling and bedazzling instead of scrolling, a body that feels good, and slow mornings where i feel put together.</p><p class="end">the life of leisure is earned.</p></section>';
   return h;
