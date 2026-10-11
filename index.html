@@ -101,6 +101,13 @@ header.top .tagline{color:#E3A79F}
 .fpill{font-style:italic;color:var(--ink)}
 .dnote{text-transform:none;flex-basis:100%;padding-left:44px;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}
 .ai-mini{font-style:italic;color:var(--accent)}
+.wt{font-size:28px;font-weight:500;min-height:0;width:140px;resize:none;padding:2px 0 6px}
+.wchart{width:100%;height:auto;margin-top:12px;overflow:visible}
+.wchart .gl{stroke:var(--line);stroke-width:1}
+.wchart .gt{font-size:11px;fill:var(--muted);font-family:var(--serif)}
+.wchart .wl{fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.wchart .wp{fill:var(--accent);stroke:var(--bg);stroke-width:2}
+.wrow{display:flex;align-items:baseline;gap:12px;width:100%;padding:10px 0;border-bottom:1px solid var(--line);text-align:left}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px 4px;margin-top:12px}
 .cal .dow{text-align:center;font-size:10.5px;letter-spacing:.2em;color:var(--muted);padding-bottom:6px}
 .cday{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:16px;font-variant-numeric:lining-nums tabular-nums;position:relative}
@@ -157,6 +164,7 @@ const FOOD=[['clean','Fresco','#D9A520','#7F5F0D'],['balanced','Balanced','#E874
 const FOOD_BY=Object.fromEntries(FOOD.map(f=>[f[0],f]));
 const HOBBY_MAIN=[['journaling','Journaling'],['drumming','Drumming'],['bedazzling','Bedazzling']];
 const HOBBY_FUN=[['headstand','Headstand'],['photography','Photography'],['atelier','Studio atelier']];
+const CYCLE=[['menstrual','menstrual'],['follicular','follicular'],['ovulation','ovulation'],['luteal','luteal']];
 const HOBBY_NAME=Object.fromEntries([...HOBBY_MAIN,...HOBBY_FUN]);
 
 const QUOTES=['The life of leisure is earned','Slow mornings, strong habits','Dolce far niente, after the checklist','Lock in now, lounge later','Postcards from your best self','Show up like it’s summer on the coast'];
@@ -235,7 +243,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-06-10';
+const APP_VERSION='2026-10-11-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -356,6 +364,7 @@ function renderToday(){
   else h+='<div class="chips">'+HL.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div>';
   h+='</div></section>';}
   const n=dayCount(d),T=dailyTotal();
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">il corpo</div><div class="caps sec-s">optional · log anytime</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="—" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
   h+='<div class="quote">'+(posted(d)?'every stamp collected. buonanotte.':n===0?'a blank page. begin.':(T-n)+' left today')+'</div>';
   return h;
 }
@@ -398,6 +407,16 @@ function renderHistory(){
   if(mdays.length){const cnt={clean:0,balanced:0,better:0},slip=[0,0,0,0,0,0,0];mdays.forEach(d=>{const f=day(d).food;cnt[f]++;if(f==='better')slip[parse(d).getDay()]++});
     const tot=mdays.length,mx=Math.max(...slip),slipDays=mx>0?FULLDOW.filter((_,i)=>slip[i]===mx):[],shade={clean:'#2B2622',balanced:'#8C8178',better:'#D8CFC3'};
     h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">la cucina</div><div class="caps sec-s">'+MONTHS[m-1].toLowerCase()+' · '+tot+' days logged</div></div></div><div class="fbar">'+FOOD.map(f=>cnt[f[0]]?'<i style="width:'+(cnt[f[0]]/tot*100)+'%;background:'+shade[f[0]]+'"></i>':'').join('')+'</div><div class="tally">'+FOOD.map(f=>f[1].toLowerCase()+' '+Math.round(cnt[f[0]]/tot*100)+'%').join(' · ')+'</div><div class="sub" style="margin-top:6px">'+(slipDays.length?'“could be better” lands most on '+slipDays.map(x=>x.toLowerCase()+'s').join(' and ')+'.':'no “could be better” days this month.')+'</div></section>';}
+  {const wd=[];for(let i=1;i<=dim;i++){const d=y+'-'+pad(m)+'-'+pad(i);if(day(d).weight!=null)wd.push(d)}
+   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">il corpo</div><div class="caps sec-s">'+MONTHS[m-1].toLowerCase()+' · weigh-ins</div></div></div>';
+   if(!wd.length)h+='<div class="sub" style="padding-top:12px">no weigh-ins this month.</div>';
+   else{const vals=wd.map(d=>+day(d).weight),lo=Math.min(...vals),hi=Math.max(...vals),first=vals[0],last=vals[vals.length-1],diff=Math.round((last-first)*10)/10;
+     if(wd.length>1){const W=320,H=120,px=14,py=16,span=Math.max(hi-lo,1),X=d=>px+(+d.slice(8)-1)/(dim-1)*(W-2*px),Y=v=>py+(hi-v)/span*(H-2*py);
+       const pts=wd.map((d,i)=>[X(d),Y(vals[i])]);
+       h+='<svg class="wchart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="weight over '+MONTHS[m-1]+'"><line x1="'+px+'" x2="'+(W-px)+'" y1="'+Y(hi)+'" y2="'+Y(hi)+'" class="gl"/><line x1="'+px+'" x2="'+(W-px)+'" y1="'+Y(lo)+'" y2="'+Y(lo)+'" class="gl"/><text x="'+(W-px)+'" y="'+(Y(hi)-4)+'" text-anchor="end" class="gt">'+hi+'</text><text x="'+(W-px)+'" y="'+(Y(lo)+12)+'" text-anchor="end" class="gt">'+lo+'</text><polyline points="'+pts.map(p=>p.map(n=>n.toFixed(1)).join(',')).join(' ')+'" class="wl"/>'+pts.map((p,i)=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="4" class="wp"><title>'+nice(wd[i]).toLowerCase()+' · '+vals[i]+' lbs'+(day(wd[i]).cycle?' · '+day(wd[i]).cycle:'')+'</title></circle>').join('')+'</svg>';}
+     h+='<div class="tally" style="padding-top:8px">'+wd.length+' weigh-in'+(wd.length>1?'s':'')+(wd.length>1?' · '+(diff>0?'+':'')+diff+' lbs since '+nice(wd[0]).split(', ')[1].toLowerCase():'')+'</div>';
+     h+=wd.slice().reverse().map(d=>{const x=day(d);return '<button class="wrow" data-act="open" data-date="'+d+'"><span class="caps" style="width:74px;text-align:left">'+nice(d).split(', ')[0]+' '+(+d.slice(8))+'</span><span class="lbl">'+esc(x.weight)+'</span><span class="sub" style="margin-left:auto">'+(x.cycle||'')+'</span></button>'}).join('');}
+   h+='</section>';}
   const weeks=[];let w=mondayOf(t);const stop=[mondayOf(APP_START),mondayOf(t)].sort()[0];
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">weekly scorecards</div><div class="caps sec-s">tap to open</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk),mm=Object.values(s.met).filter(Boolean).length;
@@ -422,6 +441,7 @@ document.addEventListener('click',e=>{
   const a=b.dataset.act,d=state.date;
   if(a==='habit'){const k=b.dataset.k;setDay(d,x=>{x.checks[k]=!x.checks[k];if(!x.checks[k])delete x.checks[k];else state.popKey=k})}
   else if(a==='workout'){const k=b.dataset.k;setDay(d,x=>{const w=new Set(x.workouts||[]);w.has(k)?w.delete(k):w.add(k);x.workouts=[...w]})}
+  else if(a==='cycle'){const k=b.dataset.k;setDay(d,x=>{if(x.cycle===k)delete x.cycle;else x.cycle=k})}
   else if(a==='food'){const k=b.dataset.k;setDay(d,x=>{x.food=x.food===k?null:k})}
   else if(a==='hobby'){const k=b.dataset.k;setDay(d,x=>{const h=new Set(hobbiesOf(x));h.has(k)?h.delete(k):h.add(k);x.hobbies=[...h];delete x.hobby})}
   else if(a==='mealprep'){const w=state.week,x=clone(state.weeks[w]);x.mealPrep=!x.mealPrep;state.weeks[w]=x;lsSet('lol.weeks',state.weeks);queueSave('weeks',w,x,pendingWeeks)}
@@ -440,9 +460,9 @@ document.addEventListener('click',e=>{
 });
 
 let deferred=false;
-function safeRender(){if(document.activeElement&&document.activeElement.id==='food-note'){deferred=true;return}render()}
-document.addEventListener('input',e=>{if(e.target.id==='food-note'){const v=e.target.value;setDay(state.date,x=>{x.foodNote=v})}});
-document.addEventListener('focusout',e=>{if(e.target.id==='food-note'&&deferred){deferred=false;setTimeout(render,0)}});
+function safeRender(){const ae=document.activeElement;if(ae&&(ae.id==='food-note'||ae.id==='weight')){deferred=true;return}render()}
+document.addEventListener('input',e=>{if(e.target.id==='weight'){const v=e.target.value.replace(/[^0-9.]/g,'');const n=parseFloat(v);setDay(state.date,x=>{if(v&&!isNaN(n))x.weight=Math.round(n*10)/10;else delete x.weight});return}if(e.target.id==='food-note'){const v=e.target.value;setDay(state.date,x=>{x.foodNote=v})}});
+document.addEventListener('focusout',e=>{if((e.target.id==='food-note'||e.target.id==='weight')&&deferred){deferred=false;setTimeout(render,0)}});
 let lastDay=todayIso();
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;if(todayIso()!==lastDay){if(state.date===lastDay)state.date=todayIso();lastDay=todayIso();render()}checkForUpdate();if(user)sync()});
 window.addEventListener('online',()=>{if(user)sync()});
