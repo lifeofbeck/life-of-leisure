@@ -243,7 +243,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-11-2';
+const APP_VERSION='2026-10-11-3';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -285,7 +285,7 @@ async function pull(){
   try{
     const [d,w]=await Promise.all([fetchAll('days','date,data'),fetchAll('weeks','monday,data')]);
     try{if(!cfgDirty){const {data:st,error:se}=await sb.from('settings').select('data').maybeSingle();if(!se&&st){state.cfg=st.data||{};lsSet('lol.cfg',state.cfg)}}}catch(e){console.warn(e)}
-    try{const a=await fetchAll('food_ai','date,rating,why');state.ai={};a.forEach(r=>{state.ai[r.date]={rating:r.rating,why:r.why}});lsSet('lol.ai',state.ai)}catch(e){console.warn(e)}
+    try{const a=await fetchAll('food_ai','date,rating,why');state.ai={};a.forEach(r=>{if(r.date>=APP_START)state.ai[r.date]={rating:r.rating,why:r.why}});lsSet('lol.ai',state.ai)}catch(e){console.warn(e)}
     {const nd={};Object.keys(state.days).forEach(k=>{if(dirty.days[k]||pendingDays.has(k))nd[k]=state.days[k]});d.forEach(r=>{if(!nd[r.date])nd[r.date]=r.data||{}});state.days=nd;}
     {const nw={};Object.keys(state.weeks).forEach(k=>{if(dirty.weeks[k]||pendingWeeks.has(k))nw[k]=state.weeks[k]});w.forEach(r=>{if(!nw[r.monday])nw[r.monday]=r.data||{}});state.weeks=nw;}
     lsSet('lol.days',state.days);lsSet('lol.weeks',state.weeks);
@@ -294,6 +294,22 @@ async function pull(){
   }catch(e){console.warn(e);setSync(navigator.onLine?'error':'offline')}
 }
 function sync(){flushAll();flushCfg();pull()}
+const isClean=x=>Object.keys(x||{}).every(k=>['date','weight','cycle'].includes(k));
+function needsFresh(){return Object.keys(state.days).some(d=>d<APP_START&&!isClean(state.days[d]))||Object.keys(state.weeks).length>0}
+async function startFresh(){
+  if(!sb||!user)return;
+  const keep={};Object.keys(state.days).filter(d=>d<APP_START).forEach(d=>{const x=state.days[d];if(x&&x.weight!=null){keep[d]={date:d,weight:x.weight};if(x.cycle)keep[d].cycle=x.cycle}});
+  Object.keys(state.days).filter(d=>d<APP_START).forEach(d=>delete state.days[d]);
+  Object.assign(state.days,keep);Object.keys(keep).forEach(d=>{dirty.days[d]=1});
+  Object.keys(state.weeks).forEach(k=>{delete dirty.weeks[k]});state.weeks={};
+  lsSet('lol.days',state.days);lsSet('lol.weeks',{});lsSet('lol.dirty',dirty);state.fresh='working';render();
+  try{
+    const r1=await sb.from('days').delete().eq('user_id',user.id).lt('date',APP_START);if(r1.error)throw r1.error;
+    const r2=await sb.from('weeks').delete().eq('user_id',user.id);if(r2.error)throw r2.error;
+    flushAll();state.fresh='done';
+  }catch(e){console.warn(e);state.fresh='error'}
+  render();
+}
 function setSync(s){state.sync=s;const el=document.getElementById('sync');if(el)el.textContent=syncText()}
 function syncText(){return{local:'saving on this device',loading:'syncing…',saved:'saved ✦ synced',offline:'offline ✦ saved on your phone, will sync when you’re back online',error:'couldn’t sync just now. it will try again when you reopen the app.'}[state.sync]||''}
 
@@ -346,9 +362,16 @@ function postmark(date){
   const d=parse(date),t=(MON[d.getMonth()]+' '+d.getDate()).toLowerCase();
   return '<svg width="74" height="74" viewBox="0 0 74 74" aria-hidden="true" style="transform:rotate(-8deg)"><circle cx="37" cy="37" r="31" fill="none" stroke="#9E3B32" stroke-width="1.2"/><circle cx="37" cy="37" r="26" fill="none" stroke="#9E3B32" stroke-width=".6"/><text x="37" y="35" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="10" letter-spacing="2.5" fill="#9E3B32">POSTED</text><text x="37" y="47" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-style="italic" font-size="11" fill="#9E3B32">'+t+'</text></svg>';
 }
+function freshCard(){
+  if(state.fresh==='done')return '<section class="about-box" style="text-align:center"><div class="sec-t">a clean page</div><p style="margin-top:8px">everything before today is cleared. your weigh-ins are safe. tomorrow begins.</p></section>';
+  if(state.fresh==='error')return '<section class="about-box" style="text-align:center"><div class="sec-t">that didn’t go through</div><p style="margin-top:8px">check your connection and try again.</p><button class="chip" style="margin-top:12px;color:var(--bg);border-color:#C9BFB3" data-act="fresh">try again</button></section>';
+  if(!needsFresh())return '';
+  if(state.fresh==='working')return '<section class="about-box" style="text-align:center"><p>clearing…</p></section>';
+  return '<section class="about-box" style="text-align:center"><div class="sec-t">start fresh</div><p style="margin-top:8px">clear every check, workout, food note and hobby before '+nice(APP_START).split(', ')[1].toLowerCase()+'. your weigh-ins stay.</p><button class="chip" style="margin-top:14px;color:var(--bg);border-color:#C9BFB3'+(state.fresh==='confirm'?';background:var(--accent);border-color:var(--accent)':'')+'" data-act="fresh">'+(state.fresh==='confirm'?'tap again to clear for good':'clear old days')+'</button></section>';
+}
 function renderToday(){
   const d=state.date,t=todayIso(),x=day(d),isToday=d===t,w=x.workouts||[],ws=weekStats(mondayOf(d));
-  let h='<div class="daybar"><button class="navbtn" data-act="day" data-d="-1" aria-label="previous day">‹</button><div style="text-align:center;flex:1"><div class="greet">'+(isToday?greeting()+', beck':nice(d).toLowerCase())+'</div>'+(isToday?'':'<button class="today-link" data-act="day" data-d="today">back to today</button>')+'</div><button class="navbtn" data-act="day" data-d="1" aria-label="next day"'+(isToday?' disabled':'')+'>›</button></div>';
+  let h=freshCard()+'<div class="daybar"><button class="navbtn" data-act="day" data-d="-1" aria-label="previous day">‹</button><div style="text-align:center;flex:1"><div class="greet">'+(isToday?greeting()+', beck':nice(d).toLowerCase())+'</div>'+(isToday?'':'<button class="today-link" data-act="day" data-d="today">back to today</button>')+'</div><button class="navbtn" data-act="day" data-d="1" aria-label="next day"'+(isToday?' disabled':'')+'>›</button></div>';
   if(posted(d))h+='<div class="postmark">'+postmark(d)+'</div>';
   h+=section('mattina','morning','morning',d);
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">spirituale</div><div class="caps sec-s">'+FULLDOW[parse(d).getDay()].toLowerCase()+'</div></div><div class="caps">'+(dayChecks(d).spirit?'1':'0')+' / 1</div></div>'+habitRow('spirit',SPIRIT[parse(d).getDay()],d)+'</section>';
@@ -442,6 +465,7 @@ document.addEventListener('click',e=>{
   if(a==='habit'){const k=b.dataset.k;setDay(d,x=>{x.checks[k]=!x.checks[k];if(!x.checks[k])delete x.checks[k];else state.popKey=k})}
   else if(a==='workout'){const k=b.dataset.k;setDay(d,x=>{const w=new Set(x.workouts||[]);w.has(k)?w.delete(k):w.add(k);x.workouts=[...w]})}
   else if(a==='cycle'){const k=b.dataset.k;setDay(d,x=>{if(x.cycle===k)delete x.cycle;else x.cycle=k})}
+  else if(a==='fresh'){if(state.fresh==='confirm'){startFresh();return}state.fresh='confirm'}
   else if(a==='food'){const k=b.dataset.k;setDay(d,x=>{x.food=x.food===k?null:k})}
   else if(a==='hobby'){const k=b.dataset.k;setDay(d,x=>{const h=new Set(hobbiesOf(x));h.has(k)?h.delete(k):h.add(k);x.hobbies=[...h];delete x.hobby})}
   else if(a==='mealprep'){const w=state.week,x=clone(state.weeks[w]);x.mealPrep=!x.mealPrep;state.weeks[w]=x;lsSet('lol.weeks',state.weeks);queueSave('weeks',w,x,pendingWeeks)}
