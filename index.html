@@ -243,7 +243,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-11-4';
+const APP_VERSION='2026-10-12-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -371,7 +371,7 @@ function freshCard(){
 }
 function renderToday(){
   const d=state.date,t=todayIso(),x=day(d),isToday=d===t,w=x.workouts||[],ws=weekStats(mondayOf(d));
-  let h=freshCard()+'<div class="daybar"><button class="navbtn" data-act="day" data-d="-1" aria-label="previous day">‹</button><div style="text-align:center;flex:1"><div class="greet">'+(isToday?greeting()+', beck':nice(d).toLowerCase())+'</div>'+(isToday?'':'<button class="today-link" data-act="day" data-d="today">back to today</button>')+'</div><button class="navbtn" data-act="day" data-d="1" aria-label="next day"'+(isToday?' disabled':'')+'>›</button></div>';
+  let h='<div class="daybar"><button class="navbtn" data-act="day" data-d="-1" aria-label="previous day">‹</button><div style="text-align:center;flex:1"><div class="greet">'+(isToday?greeting()+', beck':nice(d).toLowerCase())+'</div>'+(isToday?'':'<button class="today-link" data-act="day" data-d="today">back to today</button>')+'</div><button class="navbtn" data-act="day" data-d="1" aria-label="next day"'+(isToday?' disabled':'')+'>›</button></div>';
   if(posted(d))h+='<div class="postmark">'+postmark(d)+'</div>';
   h+=section('mattina','morning','morning',d);
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">spirituale</div><div class="caps sec-s">'+FULLDOW[parse(d).getDay()].toLowerCase()+'</div></div><div class="caps">'+(dayChecks(d).spirit?'1':'0')+' / 1</div></div>'+habitRow('spirit',SPIRIT[parse(d).getDay()],d)+'</section>';
