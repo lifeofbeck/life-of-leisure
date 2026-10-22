@@ -243,7 +243,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-1';
+const APP_VERSION='2026-10-22-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -452,7 +452,7 @@ function renderFood(){
 function renderBody(){
   const d=state.date,x=day(d);
   let h=dayBar(d);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">il corpo</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="—" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">il corpo</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
   const[y,m]=state.bmonth.split('-').map(Number),dim=new Date(y,m,0).getDate(),wd=monthDays(state.bmonth).filter(k=>day(k).weight!=null);
   const avgOf=ks=>ks.length?Math.round(ks.reduce((a,k)=>a+ +day(k).weight,0)/ks.length*10)/10:null;
   const pm=new Date(y,m-2,1),prev=monthDays(pm.getFullYear()+'-'+pad(pm.getMonth()+1)).filter(k=>day(k).weight!=null),pa=avgOf(prev);
