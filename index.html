@@ -89,23 +89,12 @@ header.top .tagline{color:#E3A79F}
 .bar{height:2px;background:var(--line);margin:10px 0 2px;position:relative}
 .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink);transition:width .4s}
 .tally{font-size:15px;color:var(--muted);font-style:italic}
-.wk-sum{font-size:17px;color:var(--ink);text-align:center;padding:4px 0 2px}
+.wk-sum{font-size:18px;font-style:italic;color:var(--ink);text-align:center;padding:4px 0 2px}
 .wk-sum b{font-weight:600}
-.wk{display:flex;flex-direction:column;padding:14px 0 16px;border-top:1px solid var(--ink)}
-.wk-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.wk-t{font-size:21px;font-weight:600;color:var(--ink)}
-.wk-n{font-size:28px;font-weight:600;color:var(--ink);font-variant-numeric:lining-nums tabular-nums;line-height:1}
-.wk-n small{font-size:16px;font-weight:500;color:var(--ink)}
-.wk-n.met{color:var(--accent)}
-.wk-bar{height:6px;background:var(--line);margin:10px 0 8px;position:relative;border-radius:3px;overflow:hidden}
-.wk-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
-.wk-bar.met i{background:var(--accent)}
-.wk-d{font-size:15px;color:var(--ink)}
-.wk .wd{color:var(--ink)}
-.wk .dot{border-color:var(--ink)}
+.wk-d{font-size:15px;color:var(--ink);font-style:italic;padding-top:10px}
 .week-dots{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;margin-top:10px}
-.wd{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;letter-spacing:.12em;color:var(--muted)}
-.dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--soft);position:relative;overflow:hidden}
+.wd{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;letter-spacing:.12em;color:var(--ink)}
+.dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--muted);position:relative;overflow:hidden}
 .dot.on{background:var(--accent);border-color:var(--accent)}
 .dot .half{position:absolute;left:0;right:0;bottom:0;background:var(--soft)}
 .mp{display:flex;align-items:center;gap:12px;padding-top:12px;margin-top:12px;border-top:1px solid var(--line);text-align:left;width:100%}
@@ -146,9 +135,9 @@ header.top .tagline{color:#E3A79F}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:5}
 nav.tabs .in{display:flex;max-width:460px;width:100%;justify-content:space-around}
 nav.tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;flex:1;min-width:0}
-nav.tabs .it{font-size:17px;white-space:nowrap;font-style:italic;color:var(--muted);line-height:1.1}
+nav.tabs .it{font-size:18px;padding:6px 0;white-space:nowrap;font-style:italic;color:var(--muted);line-height:1.1}
 nav.tabs .en{font-size:8.5px;letter-spacing:.16em;white-space:nowrap;text-transform:uppercase;color:var(--soft)}
-nav.tabs button.on .it{color:var(--ink)}
+nav.tabs button.on .it{color:var(--accent)}
 nav.tabs button.on .en{color:var(--accent)}
 .login{display:flex;flex-direction:column;gap:10px;padding-top:10px}
 .login input{text-transform:none;font:inherit;font-size:17px;padding:8px 0;border:0;border-bottom:1px solid var(--soft);background:transparent;color:var(--ink);border-radius:0}
@@ -174,7 +163,7 @@ const MORNING=[['hair','Hair'],['makeup','Makeup'],['prayer','Prayer'],['scriptu
 const NIGHT=[['digestivo','Cherry digestivo'],['shower','Shower'],['lotion','Body lotion'],['lash','Lash serum'],['retainers','Retainers']];
 const SPIRIT=['Meeting','Family worship','Personal study','Study for the meeting','Meeting','Study the Watchtower','Service'];
 const WORKOUTS=[['pilates','Pilates'],['sculpt','Sculpt'],['steps','10k steps']];
-const FOOD=[['clean','Fresco','#D9A520','#7F5F0D'],['balanced','Balanced','#E8742C','#9A4613'],['better','Could be better','#8A6A4A','#5E4630']];
+const FOOD=[['clean','Clean','#D9A520','#7F5F0D'],['balanced','Balanced','#E8742C','#9A4613'],['better','Could be better','#8A6A4A','#5E4630']];
 const FOOD_BY=Object.fromEntries(FOOD.map(f=>[f[0],f]));
 const HOBBY_MAIN=[['journaling','Journaling'],['drumming','Drumming'],['bedazzling','Bedazzling']];
 const HOBBY_FUN=[['headstand','Headstand'],['photography','Photography'],['atelier','Studio atelier']];
@@ -257,7 +246,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-3';
+const APP_VERSION='2026-10-22-5';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -346,7 +335,7 @@ function header(){
   const qi=quarterInfo(state.tab==='week'?state.week:todayIso());
   return '<header class="top"><div class="caps">'+longDate(todayIso())+'</div><div class="wordmark">life of leisure</div><div class="caps tagline">the life of leisure is earned</div><div class="caps qline">q'+qi.q+' · week '+qi.wk+' of '+qi.total+'</div></header>';
 }
-function greeting(){const h=new Date().getHours();return h<12?'buongiorno':h<17?'buon pomeriggio':'buonasera'}
+function greeting(){const h=new Date().getHours();return h<12?'good morning':h<17?'good afternoon':'good evening'}
 function habitRow(key,label,date,sub){
   const on=!!dayChecks(date)[key];
   return '<button class="row'+(on?' on':'')+'" data-act="habit" data-k="'+esc(key)+'" aria-pressed="'+on+'"><span class="mark">'+CHECK+'</span><span><span class="lbl">'+esc(label)+'</span>'+(sub?'<br><span class="sub">'+esc(sub)+'</span>':'')+'</span></button>';
@@ -389,20 +378,20 @@ function renderToday(){
   const d=state.date,t=todayIso(),x=day(d),isToday=d===t,w=x.workouts||[],ws=weekStats(mondayOf(d));
   let h=dayBar(d);
   if(posted(d))h+='<div class="postmark">'+postmark(d)+'</div>';
-  h+=section('mattina','morning','morning',d);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">spirituale</div><div class="caps sec-s">'+FULLDOW[parse(d).getDay()].toLowerCase()+'</div></div><div class="caps">'+(dayChecks(d).spirit?'1':'0')+' / 1</div></div>'+habitRow('spirit',SPIRIT[parse(d).getDay()],d)+'</section>';
-  h+=section('sera','evening','night',d);
+  h+=section('morning','','morning',d);
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">spiritual</div><div class="caps sec-s">'+FULLDOW[parse(d).getDay()].toLowerCase()+'</div></div><div class="caps">'+(dayChecks(d).spirit?'1':'0')+' / 1</div></div>'+habitRow('spirit',SPIRIT[parse(d).getDay()],d)+'</section>';
+  h+=section('night','','night',d);
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">also today</div><div class="caps sec-s">weekly goals</div></div></div>';
-  h+='<div class="group"><div class="group-h"><span class="lbl">movimento</span><span class="sub">'+ws.fit+' of '+ws.targets.fitness+' this week</span></div><div class="chips">'+WORKOUTS.map(o=>chip('workout',o[0],o[1],w.includes(o[0]))).join('')+'</div></div>';
+  h+='<div class="group"><div class="group-h"><span class="lbl">workouts</span><span class="sub">'+ws.fit+' of '+ws.targets.fitness+' this week</span></div><div class="chips">'+WORKOUTS.map(o=>chip('workout',o[0],o[1],w.includes(o[0]))).join('')+'</div></div>';
   {const ed=state.edit==='hobbies',HL=hobbyList();
-  h+='<div class="group"><div class="group-h"><span class="lbl">passatempi</span><span class="sub">'+ws.hobby+' of '+ws.targets.hobby+' this week · <button style="color:var(--accent);font-style:normal;letter-spacing:.2em;font-size:10.5px;text-transform:uppercase" data-act="edit" data-sec="hobbies">'+(ed?'done':'edit')+'</button></span></div>';
+  h+='<div class="group"><div class="group-h"><span class="lbl">hobbies</span><span class="sub">'+ws.hobby+' of '+ws.targets.hobby+' this week · <button style="color:var(--accent);font-style:normal;letter-spacing:.2em;font-size:10.5px;text-transform:uppercase" data-act="edit" data-sec="hobbies">'+(ed?'done':'edit')+'</button></span></div>';
   if(ed){h+=HL.map(o=>editRow(o[0],o[1],'hobbies')).join('')+'<form data-sec="hobbies" id="add-hobbies" style="display:flex;gap:10px;align-items:center"><input id="new-hobbies" class="note" style="min-height:0;flex:1" placeholder="pottery" autocomplete="off" aria-label="add a hobby"><button type="submit" class="chip on">add</button></form>';
     const hid=cfg().hidden.filter(k=>[...HOBBY_MAIN,...HOBBY_FUN].some(b=>b[0]===k));
     if(hid.length)h+='<div class="fun-lbl">removed: '+hid.map(k=>'<button style="text-decoration:underline" data-act="restore" data-k="'+k+'">'+esc(hobbyName(k).toLowerCase())+'</button>').join(', ')+' (tap to bring back)</div>';}
   else h+='<div class="chips">'+HL.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div>';
   h+='</div></section>';}
   const n=dayCount(d),T=dailyTotal();
-  h+='<div class="quote">'+(posted(d)?'every stamp collected. buonanotte.':n===0?'a blank page. begin.':(T-n)+' left today')+'</div>';
+  h+='<div class="quote">'+(posted(d)?'every box checked. good night.':n===0?'a blank page. begin.':(T-n)+' left today')+'</div>';
   return h;
 }
 function gazetteHead(s,inProgress){
@@ -418,8 +407,7 @@ function stat(title,en,val,target,extra,note){
 }
 function dotRow(fn){return '<div class="week-dots">'+weekStats(state.week).days.map(d=>{const f=fn(d);return '<div class="wd"><span class="dot'+(f>=1?' on':'')+'">'+(f>0&&f<1?'<span class="half" style="height:'+Math.round(f*100)+'%"></span>':'')+'</span>'+DOW[parse(d).getDay()].charAt(0).toUpperCase()+'</div>'}).join('')+'</div>'}
 function wkGoal(title,val,target,detail,fn,met){
-  const pct=Math.min(100,Math.round(val/Math.max(target,1)*100));
-  return '<section class="wk"><div class="wk-h"><span class="wk-t">'+title+'</span><span class="wk-n'+(met?' met':'')+'">'+val+'<small> / '+target+'</small></span></div><div class="wk-bar'+(met?' met':'')+'" role="img" aria-label="'+val+' of '+target+'"><i style="width:'+pct+'%"></i></div>'+(detail?'<div class="wk-d">'+detail+'</div>':'')+(fn?dotRow(fn):'')+'</section>';
+  return '<section class="sec"><div class="sec-h"><div class="sec-t">'+title+'</div><div class="caps"'+(met?' style="color:var(--accent)"':'')+'>'+(met?'goal met · ':'')+val+' / '+target+'</div></div>'+(fn?dotRow(fn):'')+(detail?'<div class="wk-d">'+detail+'</div>':'')+'</section>';
 }
 function renderWeek(){
   const mon=state.week,s=weekStats(mon),t=todayIso(),inProgress=s.days.includes(t);
@@ -434,8 +422,8 @@ function renderWeek(){
   h+=wkGoal('hobby days',s.hobby,5,hob||'none yet',d=>hobbiesOf(day(d)).length?1:0,s.met.hobby);
   h+=wkGoal('spiritual',s.spirit,7,'',d=>dayChecks(d).spirit?1:0,s.met.spirit);
   const frac=sec=>d=>{const c=dayChecks(d),L=list(sec);return L.length?L.filter(x=>c[x[0]]).length/L.length:0};
-  h+='<section class="wk"><div class="wk-h"><span class="wk-t">morning routine</span><span class="wk-n">'+s.morPct+'<small>%</small></span></div>'+dotRow(frac('morning'))+'</section>';
-  h+='<section class="wk"><div class="wk-h"><span class="wk-t">night routine</span><span class="wk-n">'+s.nigPct+'<small>%</small></span></div>'+dotRow(frac('night'))+'</section>';
+  h+=wkGoal('morning routine',s.morPct+'%','100%','',frac('morning'),false).replace(' / 100%','');
+  h+=wkGoal('night routine',s.nigPct+'%','100%','',frac('night'),false).replace(' / 100%','');
   return h;
 }
 function renderHistory(){
@@ -448,7 +436,7 @@ function renderHistory(){
   const weeks=[];let w=mondayOf(t);const stop=mondayOf(APP_START);
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
   if(weeks.length)h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">weekly scorecards</div><div class="caps sec-s">tap to open</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk),mm=Object.values(s.met).filter(Boolean).length;
-    return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span><span class="caps">'+mm+' / 4 goals</span></div><div class="sc-row">fitness '+s.fit+'/5 · fresco '+s.diet+'/5 · spiritual '+s.spirit+'/7 · hobbies '+s.hobby+'/5</div></button>'}).join('')+'</section>';
+    return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span><span class="caps">'+mm+' / 4 goals</span></div><div class="sc-row">fitness '+s.fit+'/5 · clean eating '+s.diet+'/5 · spiritual '+s.spirit+'/7 · hobbies '+s.hobby+'/5</div></button>'}).join('')+'</section>';
   h+='<section class="about-box"><div class="sec-t">why life of leisure</div><div class="caps sec-s">a note to future me</div><p>the ancient greek word for leisure, <i>scholē</i>, is where the word “school” comes from. leisure was never laziness. it was time for what matters most: learning, creating, worship, family, and real rest.</p><p class="aristotle">“we are busy so that we may have leisure.”<br><span class="who">aristotle</span></p><p>the routines, the workouts, and the clean eating are the busy part. what they buy is the leisure: time for prayer and my spiritual routine, drumming, journaling and bedazzling instead of scrolling, a body that feels good, and slow mornings where i feel put together.</p><p class="end">the life of leisure is earned.</p></section>';
   return h;
 }
@@ -458,26 +446,26 @@ function monthDays(ym){const[y,m]=ym.split('-').map(Number),dim=new Date(y,m,0).
 function renderFood(){
   const d=state.date,x=day(d),mon=mondayOf(d),ws=weekStats(mon);
   let h=dayBar(d);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">la cucina</div><div class="caps sec-s">what you ate</div></div><div class="caps">'+ws.diet+' / '+ws.targets.diet+' fresco</div></div><div class="group"><div class="chips">'+FOOD.map(f=>chip('food',f[0],f[1],x.food===f[0])).join('')+'</div><textarea id="food-note" class="note" rows="4" aria-label="what i ate today" placeholder="what did you eat today? chicken and sweet potatoes, steak bowl, strawberries">'+esc(x.foodNote||'')+'</textarea>'+aiLine(d)+'</div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">food</div><div class="caps sec-s">what you ate</div></div><div class="caps">'+ws.diet+' / '+ws.targets.diet+' clean</div></div><div class="group"><div class="chips">'+FOOD.map(f=>chip('food',f[0],f[1],x.food===f[0])).join('')+'</div><textarea id="food-note" class="note" rows="4" aria-label="what i ate today" placeholder="what did you eat today? chicken and sweet potatoes, steak bowl, strawberries">'+esc(x.foodNote||'')+'</textarea>'+aiLine(d)+'</div></section>';
   const wk=ws.days.filter(k=>k<=todayIso()&&(day(k).food||day(k).foodNote)).reverse();
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">questa settimana</div><div class="caps sec-s">fresco '+ws.diet+' · balanced '+ws.bal+' · could be better '+ws.bet+'</div></div></div>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">this week</div><div class="caps sec-s">clean '+ws.diet+' · balanced '+ws.bal+' · could be better '+ws.bet+'</div></div></div>';
   h+=wk.length?'<div class="diary-list" style="border-top:0;margin-top:4px;padding-top:4px">'+wk.map(k=>{const y=day(k),f=FOOD_BY[y.food];return '<button class="diary" style="text-align:left;width:100%" data-act="open" data-to="food" data-date="'+k+'"><span class="caps">'+DOW[parse(k).getDay()]+'</span>'+(f?'<span class="fpill">'+f[1].toLowerCase()+'</span>':'<span class="sub">not rated</span>')+(y.foodNote?'<span class="dnote">'+esc(y.foodNote)+'</span>':'')+(state.ai[k]&&FOOD_BY[state.ai[k].rating]?'<span class="dnote ai-mini">claude: '+esc(FOOD_BY[state.ai[k].rating][1].toLowerCase())+'. '+esc(state.ai[k].why)+'</span>':'')+'</button>'}).join('')+'</div>':'<div class="sub" style="padding-top:12px">nothing logged this week yet.</div>';
   h+='</section>';
   const md=monthDays(state.fmonth).filter(k=>day(k).food),cnt={clean:0,balanced:0,better:0},slip=[0,0,0,0,0,0,0];
   md.forEach(k=>{const f=day(k).food;cnt[f]++;if(f==='better')slip[parse(k).getDay()]++});
   const tot=md.length,mx=Math.max(...slip),slipDays=mx>0?FULLDOW.filter((_,i)=>slip[i]===mx):[],shade={clean:'#2B2622',balanced:'#8C8178',better:'#D8CFC3'};
-  h+='<section class="sec">'+monthNav('fmonth','il mese',tot+' days rated');
+  h+='<section class="sec">'+monthNav('fmonth','this month',tot+' days rated');
   h+=tot?'<div class="fbar">'+FOOD.map(f=>cnt[f[0]]?'<i style="width:'+(cnt[f[0]]/tot*100)+'%;background:'+shade[f[0]]+'"></i>':'').join('')+'</div><div class="tally">'+FOOD.map(f=>f[1].toLowerCase()+' '+Math.round(cnt[f[0]]/tot*100)+'%').join(' · ')+'</div><div class="sub" style="margin-top:6px">'+(slipDays.length?'“could be better” lands most on '+slipDays.map(z=>z.toLowerCase()+'s').join(' and ')+'.':'no “could be better” days this month.')+'</div>':'<div class="sub" style="padding-top:12px">no rated days this month.</div>';
   return h+'</section>';
 }
 function renderBody(){
   const d=state.date,x=day(d);
   let h=dayBar(d);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">il corpo</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">body</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
   const[y,m]=state.bmonth.split('-').map(Number),dim=new Date(y,m,0).getDate(),wd=monthDays(state.bmonth).filter(k=>day(k).weight!=null);
   const avgOf=ks=>ks.length?Math.round(ks.reduce((a,k)=>a+ +day(k).weight,0)/ks.length*10)/10:null;
   const pm=new Date(y,m-2,1),prev=monthDays(pm.getFullYear()+'-'+pad(pm.getMonth()+1)).filter(k=>day(k).weight!=null),pa=avgOf(prev);
-  h+='<section class="sec">'+monthNav('bmonth','progresso',wd.length+' weigh-in'+(wd.length===1?'':'s'));
+  h+='<section class="sec">'+monthNav('bmonth','progress',wd.length+' weigh-in'+(wd.length===1?'':'s'));
   if(!wd.length)h+='<div class="sub" style="padding-top:12px">no weigh-ins this month.</div>';
   else{const vals=wd.map(k=>+day(k).weight),lo=Math.min(...vals),hi=Math.max(...vals),diff=Math.round((vals[vals.length-1]-vals[0])*10)/10,av=avgOf(wd);
     if(wd.length>1){const W=320,H=140,px=14,py=18,span=Math.max(hi-lo,1),X=k=>px+(+k.slice(8)-1)/(dim-1)*(W-2*px),Y=v=>py+(hi-v)/span*(H-2*py);
@@ -488,7 +476,7 @@ function renderBody(){
   return h+'</section>';
 }
 function renderLogin(){
-  return '<header class="top" style="padding-top:40px"><div class="wordmark">life of leisure</div><div class="caps tagline">the life of leisure is earned</div></header><form class="login" id="login"><div class="sec-t">benvenuta</div><label for="login-email" class="caps">email</label><input id="login-email" type="email" autocomplete="username" required><label for="login-pw" class="caps">password</label><input id="login-pw" type="password" autocomplete="current-password" required>'+(loginErr?'<div class="err">'+esc(loginErr)+'</div>':'')+'<button type="submit" class="chip on" style="align-self:flex-start;margin-top:8px">sign in</button><div class="sub">you only have to do this once on this phone.</div></form>';
+  return '<header class="top" style="padding-top:40px"><div class="wordmark">life of leisure</div><div class="caps tagline">the life of leisure is earned</div></header><form class="login" id="login"><div class="sec-t">welcome</div><label for="login-email" class="caps">email</label><input id="login-email" type="email" autocomplete="username" required><label for="login-pw" class="caps">password</label><input id="login-pw" type="password" autocomplete="current-password" required>'+(loginErr?'<div class="err">'+esc(loginErr)+'</div>':'')+'<button type="submit" class="chip on" style="align-self:flex-start;margin-top:8px">sign in</button><div class="sub">you only have to do this once on this phone.</div></form>';
 }
 function render(){
   const app=document.getElementById('app'),tabsEl=document.querySelector('nav.tabs');
@@ -496,7 +484,7 @@ function render(){
   tabsEl.hidden=false;
   const body=state.tab==='week'?renderWeek():state.tab==='history'?renderHistory():state.tab==='food'?renderFood():state.tab==='body'?renderBody():renderToday();
   app.innerHTML=header()+body+'<div class="foot"><span id="sync">'+syncText()+'</span>'+(user?'<br><button class="signout" data-act="signout">sign out</button>':'')+'</div>';
-  document.getElementById('tabs').innerHTML=[['today','oggi','today'],['food','cucina','food'],['body','corpo','body'],['week','settimana','week'],['history','archivio','history']].map(t=>'<button class="'+(state.tab===t[0]?'on':'')+'" data-act="tab" data-t="'+t[0]+'" aria-current="'+(state.tab===t[0]?'page':'false')+'"><span class="it">'+t[1]+'</span><span class="en">'+t[2]+'</span></button>').join('');
+  document.getElementById('tabs').innerHTML=[['today','today'],['food','food'],['body','body'],['week','week'],['history','history']].map(t=>'<button class="'+(state.tab===t[0]?'on':'')+'" data-act="tab" data-t="'+t[0]+'" aria-current="'+(state.tab===t[0]?'page':'false')+'"><span class="it">'+t[1]+'</span></button>').join('');
 }
 
 document.addEventListener('click',e=>{
