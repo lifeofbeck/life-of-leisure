@@ -191,7 +191,7 @@ html.boho .topbar{background:var(--leather)}
 html.boho header.top{background:var(--leather);color:#F7EFE6;padding:26px 16px 22px;border-bottom:3px solid var(--turq)}
 html.boho header.top .caps{color:#CDB8A6}
 html.boho header.top .tagline{color:var(--turq-l)}
-html.boho .wordmark{font-family:var(--serif);font-style:normal;font-weight:400;font-size:36px;letter-spacing:.12em}
+html.boho .wordmark{font-family:var(--serif);font-style:normal;font-weight:400;font-size:31px;letter-spacing:.04em}
 html.boho .caps{font-family:var(--sans);letter-spacing:.22em;font-weight:400}
 html.boho .sec-t{font-family:var(--serif);font-style:normal;font-weight:400;font-size:23px;color:var(--leather);letter-spacing:.01em}
 html.boho .sec-h{border-bottom:1px solid var(--soft);padding-bottom:10px}
@@ -202,7 +202,9 @@ html.boho .greet{font-family:var(--serif);font-style:normal;font-weight:400;font
 html.boho .today-link{color:var(--turq)}
 html.boho .mark{width:20px;height:20px;border:1px solid var(--soft)}
 html.boho .row.on .mark,html.boho .mark.on{background:var(--turq);border-color:var(--turq)}
-html.boho .lbl{font-weight:400}
+html.boho .lbl{font-weight:400;font-size:16px}
+html.boho .row{min-height:44px;padding:10px 0}
+html.boho .mark{width:18px;height:18px}
 html.boho .group-h .lbl{font-family:var(--serif);font-style:normal;font-size:18px;color:var(--leather)}
 html.boho .sub,html.boho .tally,html.boho .wk-d,html.boho .legend,html.boho .foot,html.boho .quote,html.boho .wk-sum{font-style:normal}
 html.boho .chip{border:1px solid var(--soft);background:transparent;font-size:15px}
@@ -247,6 +249,7 @@ header.top{position:relative}
 html.boho .pill-in:focus{border-color:var(--turq)}
 .arch{padding-top:14px}
 .chip.danger{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
+.del-on{color:#fff!important;background:var(--accent);border-radius:999px;padding:3px 10px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -351,7 +354,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-10';
+const APP_VERSION='2026-10-22-11';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -423,7 +426,7 @@ function syncText(){return{local:'saving on this device',loading:'syncing…',sa
 
 /* ---------- habits (built-in + your own) ---------- */
 function cfg(){const c=state.cfg||{};c.custom=c.custom||{};c.custom.morning=c.custom.morning||[];c.custom.night=c.custom.night||[];c.hidden=c.hidden||[];c.custom.hobbies=c.custom.hobbies||[];return c}
-function allOf(sec){const c=cfg(),base=sec==='hobbies'?[...HOBBY_MAIN,...HOBBY_FUN]:sec==='morning'?MORNING:NIGHT;return base.concat(c.custom[sec].map(x=>[x.k,x.label]))}
+function allOf(sec){const c=cfg(),del=c.deleted||[],base=sec==='hobbies'?[...HOBBY_MAIN,...HOBBY_FUN]:sec==='morning'?MORNING:NIGHT;return base.filter(h=>!del.includes(h[0])).concat(c.custom[sec].map(x=>[x.k,x.label]))}
 function hobbyList(){const c=cfg();return allOf('hobbies').filter(h=>!c.hidden.includes(h[0]))}
 function hobbyName(k){const f=[...HOBBY_MAIN,...HOBBY_FUN].find(h=>h[0]===k)||cfg().custom.hobbies.map(x=>[x.k,x.label]).find(h=>h[0]===k);return f?f[1]:k}
 function list(sec){const c=cfg();return allOf(sec).filter(h=>!c.hidden.includes(h[0]))}
@@ -439,7 +442,7 @@ async function flushCfg(){
 const CHECK='<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5.3l2.1 2.1L8 2.8" stroke="#F7F3EC" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function header(){
   const qi=quarterInfo(state.tab==='week'?state.week:todayIso());
-  return '<header class="top"><button class="menubtn" data-act="settings" aria-label="menu"><svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><path d="M1 1h20M1 7h20M5 13h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><div class="caps">'+longDate(todayIso())+'</div><div class="wordmark">mesa</div><div class="caps tagline">the life of leisure is earned</div><div class="caps qline">q'+qi.q+' · week '+qi.wk+' of '+qi.total+'</div></header>';
+  return '<header class="top"><button class="menubtn" data-act="settings" aria-label="menu"><svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><path d="M1 1h20M1 7h20M5 13h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><div class="caps">'+longDate(todayIso())+'</div><div class="wordmark">she shows up</div><div class="caps tagline">the life of leisure is earned</div><div class="caps qline">q'+qi.q+' · week '+qi.wk+' of '+qi.total+'</div></header>';
 }
 function greeting(){const h=new Date().getHours();return h<12?'good morning':h<17?'good afternoon':'good evening'}
 function habitRow(key,label,date,sub){
@@ -608,7 +611,7 @@ function manageList(sec,title){
   let h='<section class="sec"><div class="sec-h"><div class="sec-t">'+title+'</div><div class="caps">'+on.length+' active</div></div>';
   h+=on.map(x=>'<div class="row"><span class="lbl" style="flex:1">'+esc(x[1].toLowerCase())+'</span><button class="mini" data-act="archive" data-k="'+esc(x[0])+'">archive</button></div>').join('');
   h+='<form class="addrow" data-sec="'+sec+'" id="add-'+sec+'"><input id="new-'+sec+'" class="pill-in" placeholder="add: '+ph+'" autocomplete="off" aria-label="add to '+title+'"><button type="submit" class="chip on">add</button></form>';
-  if(off.length)h+='<div class="arch"><div class="caps">archived</div><div class="chips" style="margin-top:8px">'+off.map(x=>'<button class="chip" data-act="restore" data-k="'+esc(x[0])+'">'+esc(x[1].toLowerCase())+' ＋</button>').join('')+'</div></div>';
+  if(off.length)h+='<div class="arch"><div class="caps">archived</div>'+off.map(x=>{const cf=state.delKey===x[0];return '<div class="row"><span class="lbl" style="flex:1;color:var(--muted)">'+esc(x[1].toLowerCase())+'</span><button class="mini" style="color:var(--turq)" data-act="restore" data-k="'+esc(x[0])+'">restore</button><button class="mini'+(cf?' del-on':'')+'" style="margin-left:14px" data-act="delhabit" data-sec="'+sec+'" data-k="'+esc(x[0])+'">'+(cf?'tap to delete':'delete')+'</button></div>'}).join('')+'</div>';
   return h+'</section>';
 }
 function renderSettings(){
@@ -634,7 +637,7 @@ async function startOver(){
 function startDate(){const c=cfg();return c.start&&c.start>APP_START?c.start:APP_START}
 
 function renderLogin(){
-  return '<header class="top" style="padding-top:40px"><div class="wordmark">mesa</div><div class="caps tagline">the life of leisure is earned</div></header><form class="login" id="login"><div class="sec-t">welcome</div><label for="login-email" class="caps">email</label><input id="login-email" type="email" autocomplete="username" required><label for="login-pw" class="caps">password</label><input id="login-pw" type="password" autocomplete="current-password" required>'+(loginErr?'<div class="err">'+esc(loginErr)+'</div>':'')+'<button type="submit" class="chip on" style="align-self:flex-start;margin-top:8px">sign in</button><div class="sub">you only have to do this once on this phone.</div></form>';
+  return '<header class="top" style="padding-top:40px"><div class="wordmark">she shows up</div><div class="caps tagline">the life of leisure is earned</div></header><form class="login" id="login"><div class="sec-t">welcome</div><label for="login-email" class="caps">email</label><input id="login-email" type="email" autocomplete="username" required><label for="login-pw" class="caps">password</label><input id="login-pw" type="password" autocomplete="current-password" required>'+(loginErr?'<div class="err">'+esc(loginErr)+'</div>':'')+'<button type="submit" class="chip on" style="align-self:flex-start;margin-top:8px">sign in</button><div class="sub">you only have to do this once on this phone.</div></form>';
 }
 function render(){
   const app=document.getElementById('app'),tabsEl=document.querySelector('nav.tabs');
@@ -661,8 +664,9 @@ document.addEventListener('click',e=>{
   else if(a==='month'){const key=b.dataset.k||'month',[y,m]=state[key].split('-').map(Number),n=new Date(y,m-1+(+b.dataset.d),1);state[key]=n.getFullYear()+'-'+pad(n.getMonth()+1)}
   else if(a==='open'){state.date=b.dataset.date;state.tab=b.dataset.to||'today';window.scrollTo(0,0)}
   else if(a==='signout'){if(sb)sb.auth.signOut();user=null;state.tab='today';state.days={};state.weeks={};lsSet('lol.days',{});lsSet('lol.weeks',{});}
-  else if(a==='settings'){state.prevTab=state.tab==='settings'?state.prevTab:state.tab;state.tab='settings';state.clearState=null;state.resetState=null;window.scrollTo(0,0)}
+  else if(a==='settings'){state.delKey=null;state.prevTab=state.tab==='settings'?state.prevTab:state.tab;state.tab='settings';state.clearState=null;state.resetState=null;window.scrollTo(0,0)}
   else if(a==='closeset'){state.tab=state.prevTab||'today';window.scrollTo(0,0)}
+  else if(a==='delhabit'){const k=b.dataset.k,sec=b.dataset.sec;if(state.delKey!==k){state.delKey=k}else{const c=cfg();const ci=c.custom[sec].findIndex(x=>x.k===k);if(ci>=0){c.custom[sec].splice(ci,1);c.hidden=c.hidden.filter(x=>x!==k)}else{c.deleted=c.deleted||[];if(!c.deleted.includes(k))c.deleted.push(k)}state.delKey=null;state.cfg=c;saveCfg()}}
   else if(a==='archive'){const c=cfg(),k=b.dataset.k;if(!c.hidden.includes(k))c.hidden.push(k);state.cfg=c;saveCfg()}
   else if(a==='clearday'){const el=document.getElementById('clear-date'),v=el&&el.value;if(!v||v>todayIso())return;state.clearDate=v;if(state.clearState==='confirm'){clearDay(v);state.clearedDate=v;state.clearState='done'}else state.clearState='confirm'}
   else if(a==='resetall'){if(state.resetState==='working')return;if(state.resetState==='confirm'){startOver();return}state.resetState='confirm'}
