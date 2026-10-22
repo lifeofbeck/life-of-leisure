@@ -224,6 +224,19 @@ html.boho .wk-sum b{font-weight:500;color:var(--turq)}
 html.boho .sc .lbl{font-family:var(--serif);font-style:normal!important}
 html.boho nav.tabs .it{font-family:var(--sans);font-style:normal;font-size:14px;letter-spacing:.12em;text-transform:lowercase}
 html.boho nav.tabs button.on .it{color:var(--leather);border-bottom:1.5px solid var(--turq);padding-bottom:4px}
+.cday.some .n{color:var(--accent)}
+.cday.posted .n{border:0!important;color:var(--accent)!important;font-weight:700}
+.cday.today .n{color:var(--bg)!important}
+.lg-all{font-weight:700;color:var(--accent)}
+.lg-some{color:var(--accent)}
+html.boho .cday.some .n,html.boho .cday.posted .n,html.boho .lg-all,html.boho .lg-some{color:var(--turq)!important}
+html.boho .cday.today .n{color:#fff!important}
+html.boho .dot .half{background:var(--turq)!important}
+.qbox{text-align:center}
+.qbox .aristotle{margin-top:12px}
+html.boho #weight.wt{border:1px solid var(--soft);border-radius:999px;padding:6px 16px;font-size:16px;width:150px;min-height:34px;text-align:center;font-family:var(--sans)}
+html.boho #weight.wt:focus{border-color:var(--turq)}
+html.boho #weight.wt::placeholder{font-style:normal;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -252,6 +265,7 @@ const CYCLE=[['menstrual','menstrual'],['follicular','follicular'],['ovulation',
 const HOBBY_NAME=Object.fromEntries([...HOBBY_MAIN,...HOBBY_FUN]);
 
 const QUOTES=['The life of leisure is earned','Slow mornings, strong habits','Dolce far niente, after the checklist','Lock in now, lounge later','Postcards from your best self','Show up like it’s summer on the coast'];
+const QUOTES_DAY=[["we are busy so that we may have leisure.", "aristotle"], ["well begun is half done.", "aristotle"], ["happiness depends upon ourselves.", "aristotle"], ["while we are postponing, life speeds by.", "seneca"], ["it is not that we have a short time to live, but that we waste a lot of it.", "seneca"], ["we suffer more often in imagination than in reality.", "seneca"], ["waste no more time arguing about what a good person should be. be one.", "marcus aurelius"], ["what stands in the way becomes the way.", "marcus aurelius"], ["first say to yourself what you would be; and then do what you have to do.", "epictetus"], ["no one is free who is not master of themselves.", "epictetus"], ["how we spend our days is, of course, how we spend our lives.", "annie dillard"], ["small deeds done are better than great deeds planned.", "peter marshall"], ["almost everything will work again if you unplug it for a few minutes, including you.", "anne lamott"], ["rest is not idleness.", "john lubbock"], ["the best time to plant a tree was twenty years ago. the second best time is now.", "proverb"], ["motivation is what gets you started. habit is what keeps you going.", "jim ryun"], ["a year from now you may wish you had started today.", "karen lamb"], ["be not afraid of going slowly; be afraid only of standing still.", "chinese proverb"], ["she believed she could, so she did.", "r.s. grey"], ["dolce far niente. the sweetness of doing nothing.", "italian saying"], ["adopt the pace of nature: her secret is patience.", "ralph waldo emerson"], ["you will never change your life until you change something you do daily.", "john c. maxwell"], ["it does not matter how slowly you go as long as you do not stop.", "confucius"], ["the life of leisure is earned.", "beck"]];
 const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const FULLDOW=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -327,7 +341,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-7';
+const APP_VERSION='2026-10-22-8';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -533,7 +547,7 @@ function renderWeekGrid(){
 function renderWeekTiles(){
   const s=weekStats(state.week),t=todayIso(),R=weekRows(s);
   let h=weekTop()+'<div class="tiles">'+R.slice(0,4).map(r=>{const pct=Math.min(100,Math.round(r.v/r.t*100));return '<div class="tile'+(r.met?' met':'')+'"><div class="tile-h"><div class="caps">'+r.k+'</div><div class="tile-n">'+r.v+'<small> / '+r.t+'</small></div></div><div class="tile-bar"><i style="width:'+pct+'%"></i></div>'+(r.det?'<div class="tile-d">'+r.det+'</div>':'')+'</div>'}).join('')+'</div>';
-  h+='<section class="sec"><div class="sec-h"><div class="sec-t">routines</div></div>'+R.slice(4).map(r=>'<div class="rt"><span class="rt-l">'+r.k+'</span><span class="rt-dots">'+s.days.map(d=>cell(r.fn(d),d>t)).join('')+'</span><span class="rt-n">'+r.v+'</span></div>').join('')+'</section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">routines</div><div class="caps sec-s">% of habits checked this week</div></div></div>'+R.slice(4).map(r=>'<div class="rt"><span class="rt-l">'+r.k+'</span><span class="rt-dots">'+s.days.map(d=>cell(r.fn(d),d>t)).join('')+'</span><span class="rt-n">'+r.v+'</span></div>').join('')+'</section>';
   return h;
 }
 function renderWeekDays(){
@@ -548,13 +562,14 @@ function renderHistory(){
   let cells=['M','T','W','T','F','S','S'].map(x=>'<div class="dow">'+x+'</div>').join('');
   for(let i=0;i<lead;i++)cells+='<div></div>';
   for(let i=1;i<=dim;i++){const d=y+'-'+pad(m)+'-'+pad(i),fut=d>t,n=dayCount(d);
-    cells+='<button class="cday'+(fut?' future':'')+(d===t?' today':'')+(posted(d)?' posted':'')+'" data-act="open" data-date="'+d+'"'+(fut?' disabled':'')+' aria-label="'+nice(d)+', '+n+' of '+dailyTotal()+'"><span class="n">'+i+'</span><span class="pip'+(!fut&&n>0&&!posted(d)?'':' hide')+'"></span></button>'}
-  let h='<section class="sec"><div class="sec-h" style="align-items:center"><button class="navbtn" data-act="month" data-d="-1" aria-label="previous month">‹</button><div style="text-align:center"><div class="sec-t">'+MONTHS[m-1].toLowerCase()+'</div><div class="caps sec-s">'+y+'</div></div><button class="navbtn" data-act="month" data-d="1" aria-label="next month"'+(state.month>=t.slice(0,7)?' disabled':'')+'>›</button></div><div class="cal">'+cells+'</div><div class="legend"><span>circled · every stamp</span><span>dot · some stamps</span></div></section>';
+    cells+='<button class="cday'+(fut?' future':'')+(d===t?' today':'')+(posted(d)?' posted':(!fut&&n>0?' some':''))+'" data-act="open" data-date="'+d+'"'+(fut?' disabled':'')+' aria-label="'+nice(d)+', '+n+' of '+dailyTotal()+'"><span class="n">'+i+'</span></button>'}
+  let h='<section class="sec"><div class="sec-h" style="align-items:center"><button class="navbtn" data-act="month" data-d="-1" aria-label="previous month">‹</button><div style="text-align:center"><div class="sec-t">'+MONTHS[m-1].toLowerCase()+'</div><div class="caps sec-s">'+y+'</div></div><button class="navbtn" data-act="month" data-d="1" aria-label="next month"'+(state.month>=t.slice(0,7)?' disabled':'')+'>›</button></div><div class="cal">'+cells+'</div><div class="legend"><span><b class="lg-all">bold</b> · every habit done</span><span><span class="lg-some">color</span> · some habits done</span></div></section>';
   const weeks=[];let w=mondayOf(t);const stop=mondayOf(APP_START);
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
   if(weeks.length)h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">weekly scorecards</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk),mm=Object.values(s.met).filter(Boolean).length;
     return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span><span class="caps">'+mm+' / 4 goals</span></div><div class="sc-row">workouts '+s.fit+'/5 · clean '+s.diet+'/5 · hobbies '+s.hobby+'/5 · spiritual '+s.spirit+'/7</div></button>'}).join('')+'</section>';
-  h+='<section class="about-box"><div class="sec-t">why life of leisure</div><div class="caps sec-s">a note to future me</div><p>the ancient greek word for leisure, <i>scholē</i>, is where the word “school” comes from. leisure was never laziness. it was time for what matters most: learning, creating, worship, family, and real rest.</p><p class="aristotle">“we are busy so that we may have leisure.”<br><span class="who">aristotle</span></p><p>the routines, the workouts, and the clean eating are the busy part. what they buy is the leisure: time for prayer and my spiritual routine, drumming, journaling and bedazzling instead of scrolling, a body that feels good, and slow mornings where i feel put together.</p><p class="end">the life of leisure is earned.</p></section>';
+  {const q=QUOTES_DAY[(Math.floor((parse(t)-new Date(parse(t).getFullYear(),0,0))/864e5))%QUOTES_DAY.length];
+   h+='<section class="about-box qbox"><div class="caps">today’s quote</div><p class="aristotle">“'+q[0]+'”<br><span class="who">'+q[1]+'</span></p></section>';}
   return h;
 }
 function monthNav(key,title,sub){const cur=state[key],t=todayIso(),[y,m]=cur.split('-').map(Number);
@@ -578,7 +593,7 @@ function renderFood(){
 function renderBody(){
   const d=state.date,x=day(d);
   let h=dayBar(d);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">body</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">body</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="tap to add" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
   const[y,m]=state.bmonth.split('-').map(Number),dim=new Date(y,m,0).getDate(),wd=monthDays(state.bmonth).filter(k=>day(k).weight!=null);
   const avgOf=ks=>ks.length?Math.round(ks.reduce((a,k)=>a+ +day(k).weight,0)/ks.length*10)/10:null;
   const pm=new Date(y,m-2,1),prev=monthDays(pm.getFullYear()+'-'+pad(pm.getMonth()+1)).filter(k=>day(k).weight!=null),pa=avgOf(prev);
