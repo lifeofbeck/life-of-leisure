@@ -93,6 +93,43 @@ header.top .tagline{color:#E3A79F}
 .wk-sum{font-size:18px;font-style:italic;color:var(--ink);text-align:center;padding:4px 0 2px}
 .wk-sum b{font-weight:600}
 .wk-d{font-size:15px;color:var(--ink);font-style:italic;padding-top:10px}
+.wgrid{display:grid;grid-template-columns:minmax(84px,1fr) repeat(7,26px) 44px;align-items:center;row-gap:12px;column-gap:4px;padding-top:14px}
+.wg-d{text-align:center;font-size:12px;color:var(--muted);letter-spacing:.1em}
+.wg-d.now{color:var(--accent)}
+.wg-l{font-size:15px}
+.wg-c{display:grid;place-items:center}
+.wg-n{text-align:right;font-size:14px;font-variant-numeric:tabular-nums}
+.wg-n.met{color:var(--accent)}
+.wg-sep{grid-column:1/-1;height:1px;background:var(--line)}
+.dot.fut{opacity:.35}
+.wg-det{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.tile-n{font-size:30px;line-height:1;font-variant-numeric:lining-nums tabular-nums}
+.tile-n small{font-size:15px;color:var(--muted)}
+.tile.met .tile-n{color:var(--accent)}
+.tile-bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.tile-bar i{display:block;height:100%;background:var(--accent)}
+.tile-d{font-size:13px;color:var(--muted)}
+.rt{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.rt-l{width:70px;font-size:15px}
+.rt-dots{flex:1;display:flex;justify-content:space-between}
+.rt-n{width:40px;text-align:right;font-size:14px}
+.tally4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.t4-n{font-size:26px;line-height:1.1}
+.t4-n small{font-size:13px;color:var(--muted)}
+.t4.met .t4-n{color:var(--accent)}
+.t4 .caps{font-size:9px;letter-spacing:.14em}
+.dayrow{display:flex;align-items:center;gap:12px;width:100%;padding:12px 0;border-bottom:1px solid var(--line);text-align:left}
+.dr-d{display:flex;flex-direction:column;align-items:center;width:38px}
+.dr-n{font-size:20px;line-height:1}
+.dr-tags{flex:1;display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:12px;padding:2px 9px;border-radius:999px;background:var(--wash);color:var(--ink)}
+.dr-p{font-size:13px;color:var(--muted)}
+html.boho .tile-bar i{background:var(--turq)}
+html.boho .tile.met .tile-n,html.boho .t4.met .t4-n,html.boho .wg-n.met{color:var(--turq)}
+html.boho .wg-d.now{color:var(--turq)}
+html.boho .tile-n,html.boho .t4-n,html.boho .dr-n{font-family:var(--serif)}
 .week-dots{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;margin-top:10px}
 .wd{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;letter-spacing:.12em;color:var(--ink)}
 .dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--muted);position:relative;overflow:hidden}
@@ -453,7 +490,7 @@ function dotRow(fn){return '<div class="week-dots">'+weekStats(state.week).days.
 function wkGoal(title,val,target,detail,fn,met){
   return '<section class="sec"><div class="sec-h"><div class="sec-t">'+title+'</div><div class="caps"'+(met?' style="color:var(--accent)"':'')+'>'+(met?'goal met · ':'')+val+' / '+target+'</div></div>'+(fn?dotRow(fn):'')+(detail?'<div class="wk-d">'+detail+'</div>':'')+'</section>';
 }
-function renderWeek(){
+function renderWeekList(){
   const mon=state.week,s=weekStats(mon),t=todayIso(),inProgress=s.days.includes(t);
   const range=nice(mon).split(', ')[1].toLowerCase()+' – '+nice(add(mon,6)).split(', ')[1].toLowerCase();
   let h='<div class="weeknav"><button class="navbtn" data-act="week" data-d="-7" aria-label="previous week">‹</button><div class="caps" style="color:var(--ink)">week of '+range+'</div><button class="navbtn" data-act="week" data-d="7" aria-label="next week"'+(add(mon,7)>t?' disabled':'')+'>›</button></div>';
@@ -470,6 +507,42 @@ function renderWeek(){
   h+=wkGoal('night routine',s.nigPct+'%','100%','',frac('night'),false).replace(' / 100%','');
   return h;
 }
+function weekRows(s){
+  const frac=sec=>d=>{const c=dayChecks(d),L=list(sec);return L.length?L.filter(x=>c[x[0]]).length/L.length:0};
+  return [
+    {k:'workouts',v:s.fit,t:5,met:s.met.fitness,fn:d=>(day(d).workouts||[]).length?1:0,det:'pilates '+s.fitS+' · sculpt '+s.fitM+' · steps '+s.stepsN},
+    {k:'clean eating',v:s.diet,t:5,met:s.met.diet,fn:d=>{const f=day(d).food;return f==='clean'?1:f==='balanced'?.5:0},det:'balanced '+s.bal+' · could be better '+s.bet},
+    {k:'hobbies',v:s.hobby,t:5,met:s.met.hobby,fn:d=>hobbiesOf(day(d)).length?1:0,det:Object.entries(s.hob).map(([k,v])=>hobbyName(k).toLowerCase()+' '+v).join(' · ')},
+    {k:'spiritual',v:s.spirit,t:7,met:s.met.spirit,fn:d=>dayChecks(d).spirit?1:0,det:''},
+    {k:'morning',v:s.morPct+'%',pct:true,fn:frac('morning')},
+    {k:'night',v:s.nigPct+'%',pct:true,fn:frac('night')}];
+}
+function cell(f,fut){return '<span class="dot'+(f>=1?' on':'')+(fut?' fut':'')+'">'+(f>0&&f<1?'<span class="half" style="height:'+Math.round(f*100)+'%"></span>':'')+'</span>'}
+function weekTop(){const mon=state.week,s=weekStats(mon),t=todayIso(),inProgress=s.days.includes(t);
+  const range=nice(mon).split(', ')[1].toLowerCase()+' – '+nice(add(mon,6)).split(', ')[1].toLowerCase();
+  const m=Object.values(s.met).filter(Boolean).length,left=s.days.filter(d=>d>t).length;
+  return '<div class="weeknav"><button class="navbtn" data-act="week" data-d="-7" aria-label="previous week">‹</button><div style="text-align:center"><div class="caps" style="color:var(--ink)">week of '+range+'</div><div class="wk-sum" style="font-size:15px;padding-top:4px"><b>'+m+' of 4</b> goals met'+(inProgress?' · '+(left===0?'last day':left+' day'+(left>1?'s':'')+' left'):'')+'</div></div><button class="navbtn" data-act="week" data-d="7" aria-label="next week"'+(add(mon,7)>t?' disabled':'')+'>›</button></div>';}
+function renderWeekGrid(){
+  const s=weekStats(state.week),t=todayIso(),R=weekRows(s);
+  let h=weekTop()+'<section class="sec"><div class="sec-h"><div class="sec-t">at a glance</div></div><div class="wgrid"><span></span>'+s.days.map(d=>'<span class="wg-d'+(d===t?' now':'')+'">'+DOW[parse(d).getDay()].charAt(0).toLowerCase()+'</span>').join('')+'<span></span>';
+  R.forEach((r,i)=>{if(i===4)h+='<span class="wg-sep"></span>';h+='<span class="wg-l">'+r.k+'</span>'+s.days.map(d=>'<span class="wg-c">'+cell(r.fn(d),d>t)+'</span>').join('')+'<span class="wg-n'+(r.met?' met':'')+'">'+(r.pct?r.v:r.v+'/'+r.t)+'</span>'});
+  h+='</div></section>';
+  h+='<section class="sec"><div class="sec-h"><div class="sec-t">details</div></div>'+R.slice(0,3).filter(r=>r.det).map(r=>'<div class="wg-det"><span class="caps">'+r.k+'</span><span>'+r.det+'</span></div>').join('')+'</section>';
+  return h;
+}
+function renderWeekTiles(){
+  const s=weekStats(state.week),t=todayIso(),R=weekRows(s);
+  let h=weekTop()+'<div class="tiles">'+R.slice(0,4).map(r=>{const pct=Math.min(100,Math.round(r.v/r.t*100));return '<div class="tile'+(r.met?' met':'')+'"><div class="caps">'+r.k+'</div><div class="tile-n">'+r.v+'<small> / '+r.t+'</small></div><div class="tile-bar"><i style="width:'+pct+'%"></i></div>'+(r.det?'<div class="tile-d">'+r.det+'</div>':'')+'</div>'}).join('')+'</div>';
+  h+='<section class="sec"><div class="sec-h"><div class="sec-t">routines</div></div>'+R.slice(4).map(r=>'<div class="rt"><span class="rt-l">'+r.k+'</span><span class="rt-dots">'+s.days.map(d=>cell(r.fn(d),d>t)).join('')+'</span><span class="rt-n">'+r.v+'</span></div>').join('')+'</section>';
+  return h;
+}
+function renderWeekDays(){
+  const s=weekStats(state.week),t=todayIso(),R=weekRows(s);
+  let h=weekTop()+'<div class="tally4">'+R.slice(0,4).map(r=>'<div class="t4'+(r.met?' met':'')+'"><div class="t4-n">'+r.v+'<small>/'+r.t+'</small></div><div class="caps">'+r.k+'</div></div>').join('')+'</div>';
+  h+='<section class="sec"><div class="sec-h"><div class="sec-t">day by day</div></div>'+s.days.slice().reverse().filter(d=>d<=t).map(d=>{const tags=R.slice(0,4).filter(r=>r.fn(d)>=1).map(r=>'<span class="tag">'+r.k+'</span>').join('');return '<button class="dayrow" data-act="open" data-date="'+d+'"><span class="dr-d"><span class="caps">'+DOW[parse(d).getDay()]+'</span><span class="dr-n">'+(+d.slice(8))+'</span></span><span class="dr-tags">'+(tags||'<span class="sub">nothing logged</span>')+'</span><span class="dr-p">'+dayCount(d)+'/'+dailyTotal()+'</span></button>'}).join('')+'</section>';
+  return h;
+}
+function renderWeek(){const v=state.wkView||lsGet('lol.wk','list');return v==='grid'?renderWeekGrid():v==='tiles'?renderWeekTiles():v==='days'?renderWeekDays():renderWeekList()}
 function renderHistory(){
   const[y,m]=state.month.split('-').map(Number),first=new Date(y,m-1,1),t=todayIso(),lead=(first.getDay()+6)%7,dim=new Date(y,m,0).getDate();
   let cells=['M','T','W','T','F','S','S'].map(x=>'<div class="dow">'+x+'</div>').join('');
