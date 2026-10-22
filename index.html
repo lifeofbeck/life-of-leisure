@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mesa">
 <meta name="theme-color" content="#3F2A1F">
+<meta name="color-scheme" content="dark">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="mesa-icon-180.png">
 <link rel="icon" type="image/png" href="mesa-icon-192.png">
@@ -186,7 +187,8 @@ nav.tabs button.on .en{color:var(--accent)}
 /* ---------- free spirit boho ---------- */
 html.boho{--bg:#FAF7F2;--ink:#3A2C24;--muted:#8F7D70;--soft:#D3C6B8;--line:#EAE2D8;--wash:#F2ECE4;--accent:#A8684A;--turq:#3E9E96;--turq-l:#B9E0DA;--leather:#3F2A1F;--tan:#C9A27E;
   --serif:'Bodoni Moda','Didot',Georgia,serif;--sans:'Jost','Avenir Next','Helvetica Neue',sans-serif}
-html.boho{background:var(--leather)}
+html.boho{background:var(--leather);color-scheme:dark}
+html.boho body,html.boho input,html.boho textarea{color-scheme:light}
 html.boho body{font-family:var(--sans);font-size:17px;line-height:1.5;font-weight:400;min-height:100vh;min-height:100dvh}
 html.boho,html.boho body{overscroll-behavior-y:none}
 html.boho .topbar{background:var(--leather)}
@@ -356,7 +358,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-14';
+const APP_VERSION='2026-10-22-15';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
