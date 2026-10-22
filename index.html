@@ -15,7 +15,7 @@
 <title>Life of Leisure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Rye&family=Zilla+Slab:wght@500;600&family=Jost:wght@400;500&display=swap" rel="stylesheet">
 <script>(function(){try{var q=new URLSearchParams(location.search).get('theme');if(q){localStorage.setItem('lol.theme',q)}var t=localStorage.getItem('lol.theme');if(t==='boho'){document.documentElement.classList.add('boho');document.querySelector('meta[name=theme-color]').setAttribute('content','#6E4428')}}catch(e){}})();</script>
 <style>
 :root{
@@ -146,30 +146,33 @@ nav.tabs button.on .en{color:var(--accent)}
 .err{color:var(--accent);font-size:15px}
 
 /* ---------- western boho ---------- */
-html.boho{--bg:#F3EADB;--ink:#3B2A20;--muted:#8E735C;--soft:#C9B193;--line:#E2D2BC;--wash:#EADCC6;--accent:#9C5A33;--turq:#2F9C95;--turq-l:#BFE3DC;--leather:#6E4428;--tan:#C89B66;
-  --serif:'Fraunces','Iowan Old Style',Georgia,serif;--sans:'Jost','Avenir Next','Helvetica Neue',sans-serif}
+html.boho{--bg:#F3EADB;--ink:#2E1D14;--muted:#8E735C;--soft:#C9B193;--line:#E2D2BC;--wash:#EADCC6;--accent:#8A4A2B;--turq:#2A9890;--turq-l:#A9DDD5;--leather:#3F2518;--tan:#BE9363;
+  --serif:'Zilla Slab','Rockwell',Georgia,serif;--wm:'Rye','Zilla Slab',Georgia,serif;--sans:'Jost','Avenir Next','Helvetica Neue',sans-serif}
 html.boho body{font-family:var(--sans);font-size:17px;line-height:1.45}
 html.boho .topbar{background:var(--leather)}
-html.boho header.top{background:var(--leather);color:#F6EBDA;padding:28px 16px 26px;position:relative;border-bottom:4px solid var(--turq)}
-html.boho header.top::after{content:"";position:absolute;inset:auto 12px 8px 12px;border-top:1.5px dashed rgba(246,235,218,.45)}
+html.boho header.top{background:var(--leather);color:#F6EBDA;padding:28px 16px 34px;position:relative;border-bottom:0}
+html.boho header.top{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10'%3E%3Cpath d='M0 10 L10 0 L20 10 Z' fill='%232A9890'/%3E%3Cpath d='M5 10 L10 5 L15 10 Z' fill='%23F3EADB'/%3E%3C/svg%3E");background-repeat:repeat-x;background-position:left bottom;background-size:20px 10px}
+html.boho header.top::after{content:"";position:absolute;inset:auto 12px 18px 12px;border-top:1.5px dashed rgba(246,235,218,.45)}
 html.boho header.top .caps{color:#D9BF9C}
 html.boho header.top .tagline{color:var(--turq-l)}
-html.boho header.top::before{content:"✦  ✦  ✦";font-size:10px;letter-spacing:.3em;color:var(--turq-l);margin-bottom:4px}
-html.boho .wordmark,html.boho .sec-t,html.boho .greet{font-family:var(--serif);font-weight:500}
-html.boho .wordmark{font-size:32px}
+html.boho header.top::before{content:'';width:70px;height:10px;margin-bottom:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='10' viewBox='0 0 70 10'%3E%3Cpath d='M0 5 H24 M46 5 H70' stroke='%23A9DDD5' stroke-width='1'/%3E%3Cpath d='M35 0 L40 5 L35 10 L30 5 Z' fill='%232A9890' stroke='%23A9DDD5' stroke-width='1'/%3E%3C/svg%3E") no-repeat center}
+html.boho .wordmark,html.boho .sec-t,html.boho .greet,html.boho .group-h .lbl{font-family:var(--serif);font-weight:600;font-style:normal}
+html.boho .wordmark{font-family:var(--wm);font-weight:400;letter-spacing:.02em}
+html.boho .wordmark{font-size:30px}
 html.boho .caps{font-family:var(--sans);letter-spacing:.2em;font-weight:500}
-html.boho .sec-t{font-size:25px;color:var(--leather)}
+html.boho .sec-t{font-size:24px;color:var(--leather);display:flex;align-items:center;gap:8px}
+html.boho .sec-t::before{content:'';width:12px;height:12px;flex:none;background:var(--turq);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
 html.boho .sec-h{border-bottom:2px dashed var(--tan);padding-bottom:10px}
 html.boho .sec-h .caps{color:var(--ink)}
 html.boho .sec-h button.caps{color:var(--turq)!important}
 html.boho .daybar{border:1.5px dashed var(--tan);border-radius:14px;padding:8px 10px}
-html.boho .greet{font-size:22px;color:var(--leather)}
+html.boho .greet{font-size:22px;color:var(--leather);font-weight:500}
 html.boho .today-link{color:var(--turq)}
 html.boho .row{border-bottom:1px solid var(--line)}
 html.boho .mark{width:20px;height:20px;border:1.5px solid var(--soft)}
 html.boho .row.on .mark,html.boho .mark.on{background:var(--turq);border-color:var(--turq)}
 html.boho .lbl{font-weight:400}
-html.boho .group-h .lbl{font-family:var(--serif);font-style:normal;font-weight:500;font-size:19px;color:var(--leather)}
+html.boho .group-h .lbl{font-size:19px;color:var(--leather)}
 html.boho .sub,html.boho .tally,html.boho .wk-d,html.boho .legend,html.boho .foot,html.boho .quote{font-style:normal}
 html.boho .group{border-bottom:1px solid var(--line)}
 html.boho .chip{border:1.5px solid var(--soft);background:#F8F1E6;font-size:15px;border-radius:10px}
