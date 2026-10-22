@@ -186,7 +186,9 @@ nav.tabs button.on .en{color:var(--accent)}
 /* ---------- free spirit boho ---------- */
 html.boho{--bg:#FAF7F2;--ink:#3A2C24;--muted:#8F7D70;--soft:#D3C6B8;--line:#EAE2D8;--wash:#F2ECE4;--accent:#A8684A;--turq:#3E9E96;--turq-l:#B9E0DA;--leather:#3F2A1F;--tan:#C9A27E;
   --serif:'Bodoni Moda','Didot',Georgia,serif;--sans:'Jost','Avenir Next','Helvetica Neue',sans-serif}
-html.boho body{font-family:var(--sans);font-size:17px;line-height:1.5;font-weight:400}
+html.boho{background:var(--leather)}
+html.boho body{font-family:var(--sans);font-size:17px;line-height:1.5;font-weight:400;min-height:100vh;min-height:100dvh}
+html.boho,html.boho body{overscroll-behavior-y:none}
 html.boho .topbar{background:var(--leather)}
 html.boho header.top{background:var(--leather);color:#F7EFE6;padding:26px 16px 22px;border-bottom:3px solid var(--turq)}
 html.boho header.top .caps{color:#CDB8A6}
@@ -239,7 +241,7 @@ html.boho .dot .half{background:var(--turq)!important}
 html.boho #weight.wt{border:1px solid var(--soft);border-radius:999px;padding:6px 14px;font-size:15px;line-height:20px;width:96px;height:34px;min-height:34px;text-align:center;font-family:var(--sans);font-weight:400;resize:none}
 html.boho #weight.wt:focus{border-color:var(--turq)}
 html.boho #weight.wt::placeholder{font-style:normal;color:var(--muted)}
-.menubtn{position:absolute;top:calc(env(safe-area-inset-top,0px) + 16px);right:16px;width:40px;height:40px;display:grid;place-items:center;color:inherit;opacity:.85}
+.menubtn{position:absolute;top:14px;right:12px;width:40px;height:40px;display:grid;place-items:center;color:inherit;opacity:.85}
 header.top{position:relative}
 .setbar{display:flex;align-items:center;justify-content:space-between}
 .mini{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -354,7 +356,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-13';
+const APP_VERSION='2026-10-22-14';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
