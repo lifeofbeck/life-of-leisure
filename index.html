@@ -103,14 +103,15 @@ header.top .tagline{color:#E3A79F}
 .wg-sep{grid-column:1/-1;height:1px;background:var(--line)}
 .dot.fut{opacity:.35}
 .wg-det{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.tile{border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.tiles{display:flex;flex-direction:column;gap:12px}
+.tile-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
 .tile-n{font-size:30px;line-height:1;font-variant-numeric:lining-nums tabular-nums}
 .tile-n small{font-size:15px;color:var(--muted)}
 .tile.met .tile-n{color:var(--accent)}
 .tile-bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
 .tile-bar i{display:block;height:100%;background:var(--accent)}
-.tile-d{font-size:13px;color:var(--muted)}
+.tile-d{font-size:14px;color:var(--muted)}
 .rt{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .rt-l{width:70px;font-size:15px}
 .rt-dots{flex:1;display:flex;justify-content:space-between}
@@ -532,7 +533,7 @@ function renderWeekGrid(){
 }
 function renderWeekTiles(){
   const s=weekStats(state.week),t=todayIso(),R=weekRows(s);
-  let h=weekTop()+'<div class="tiles">'+R.slice(0,4).map(r=>{const pct=Math.min(100,Math.round(r.v/r.t*100));return '<div class="tile'+(r.met?' met':'')+'"><div class="caps">'+r.k+'</div><div class="tile-n">'+r.v+'<small> / '+r.t+'</small></div><div class="tile-bar"><i style="width:'+pct+'%"></i></div>'+(r.det?'<div class="tile-d">'+r.det+'</div>':'')+'</div>'}).join('')+'</div>';
+  let h=weekTop()+'<div class="tiles">'+R.slice(0,4).map(r=>{const pct=Math.min(100,Math.round(r.v/r.t*100));return '<div class="tile'+(r.met?' met':'')+'"><div class="tile-h"><div class="caps">'+r.k+'</div><div class="tile-n">'+r.v+'<small> / '+r.t+'</small></div></div><div class="tile-bar"><i style="width:'+pct+'%"></i></div>'+(r.det?'<div class="tile-d">'+r.det+'</div>':'')+'</div>'}).join('')+'</div>';
   h+='<section class="sec"><div class="sec-h"><div class="sec-t">routines</div></div>'+R.slice(4).map(r=>'<div class="rt"><span class="rt-l">'+r.k+'</span><span class="rt-dots">'+s.days.map(d=>cell(r.fn(d),d>t)).join('')+'</span><span class="rt-n">'+r.v+'</span></div>').join('')+'</section>';
   return h;
 }
