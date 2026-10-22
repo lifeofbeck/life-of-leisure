@@ -4,8 +4,8 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#F7F3EC",
-  "theme_color": "#2B2622",
+  "background_color": "#FAF7F2",
+  "theme_color": "#3F2A1F",
   "icons": [
     {
       "src": "vita-icon-192.png",

@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Bodoni+Moda:wght@400;500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
-<script>(function(){try{var q=new URLSearchParams(location.search).get('theme');if(q){localStorage.setItem('lol.theme',q)}var t=localStorage.getItem('lol.theme');if(t==='boho'){document.documentElement.classList.add('boho');document.querySelector('meta[name=theme-color]').setAttribute('content','#6E4428')}}catch(e){}})();</script>
+<script>(function(){try{var q=new URLSearchParams(location.search).get('theme');if(q){localStorage.setItem('lol.theme',q)}var t=localStorage.getItem('lol.theme');if(t!=='classic'){document.documentElement.classList.add('boho');document.querySelector('meta[name=theme-color]').setAttribute('content','#3F2A1F')}}catch(e){}})();</script>
 <style>
 :root{
   --bg:#F7F3EC;--ink:#2B2622;--muted:#8C8178;--soft:#B5ABA0;--line:#E4DCD0;--wash:#EFE8DD;--accent:#9E3B32;
@@ -328,7 +328,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-5';
+const APP_VERSION='2026-10-22-6';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -543,7 +543,7 @@ function renderWeekDays(){
   h+='<section class="sec"><div class="sec-h"><div class="sec-t">day by day</div></div>'+s.days.slice().reverse().filter(d=>d<=t).map(d=>{const tags=R.slice(0,4).filter(r=>r.fn(d)>=1).map(r=>'<span class="tag">'+r.k+'</span>').join('');return '<button class="dayrow" data-act="open" data-date="'+d+'"><span class="dr-d"><span class="caps">'+DOW[parse(d).getDay()]+'</span><span class="dr-n">'+(+d.slice(8))+'</span></span><span class="dr-tags">'+(tags||'<span class="sub">nothing logged</span>')+'</span><span class="dr-p">'+dayCount(d)+'/'+dailyTotal()+'</span></button>'}).join('')+'</section>';
   return h;
 }
-function renderWeek(){const v=state.wkView||lsGet('lol.wk','list');return v==='grid'?renderWeekGrid():v==='tiles'?renderWeekTiles():v==='days'?renderWeekDays():renderWeekList()}
+function renderWeek(){const v=state.wkView||lsGet('lol.wk','tiles');return v==='grid'?renderWeekGrid():v==='tiles'?renderWeekTiles():v==='days'?renderWeekDays():renderWeekList()}
 function renderHistory(){
   const[y,m]=state.month.split('-').map(Number),first=new Date(y,m-1,1),t=todayIso(),lead=(first.getDay()+6)%7,dim=new Date(y,m,0).getDate();
   let cells=['M','T','W','T','F','S','S'].map(x=>'<div class="dow">'+x+'</div>').join('');
