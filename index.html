@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mesa">
-<meta name="theme-color" content="#2B2622">
+<meta name="theme-color" content="#3F2A1F">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="mesa-icon-180.png">
 <link rel="icon" type="image/png" href="mesa-icon-192.png">
@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Bodoni+Moda:wght@400;500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
-<script>(function(){try{var q=new URLSearchParams(location.search).get('theme');if(q){localStorage.setItem('lol.theme',q)}var t=localStorage.getItem('lol.theme');if(t!=='classic'){document.documentElement.classList.add('boho');document.querySelector('meta[name=theme-color]').setAttribute('content','#3F2A1F')}}catch(e){}})();</script>
+<script>(function(){try{var q=new URLSearchParams(location.search).get('theme');if(q){localStorage.setItem('lol.theme',q)}var t=localStorage.getItem('lol.theme');if(t==='classic'){document.querySelector('meta[name=theme-color]').setAttribute('content','#2B2622')}else{document.documentElement.classList.add('boho');document.querySelector('meta[name=theme-color]').setAttribute('content','#3F2A1F')}}catch(e){}})();</script>
 <style>
 :root{
   --bg:#F7F3EC;--ink:#2B2622;--muted:#8C8178;--soft:#B5ABA0;--line:#E4DCD0;--wash:#EFE8DD;--accent:#9E3B32;
@@ -354,7 +354,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-12';
+const APP_VERSION='2026-10-22-13';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
