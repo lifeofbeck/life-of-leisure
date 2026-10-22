@@ -234,9 +234,19 @@ html.boho .cday.today .n{color:#fff!important}
 html.boho .dot .half{background:var(--turq)!important}
 .qbox{text-align:center}
 .qbox .aristotle{margin-top:12px}
-html.boho #weight.wt{border:1px solid var(--soft);border-radius:999px;padding:6px 16px;font-size:16px;width:150px;min-height:34px;text-align:center;font-family:var(--sans)}
+html.boho #weight.wt{border:1px solid var(--soft);border-radius:999px;padding:6px 14px;font-size:15px;line-height:20px;width:96px;height:34px;min-height:34px;text-align:center;font-family:var(--sans);font-weight:400;resize:none}
 html.boho #weight.wt:focus{border-color:var(--turq)}
 html.boho #weight.wt::placeholder{font-style:normal;color:var(--muted)}
+.menubtn{position:absolute;top:calc(env(safe-area-inset-top,0px) + 16px);right:16px;width:40px;height:40px;display:grid;place-items:center;color:inherit;opacity:.85}
+header.top{position:relative}
+.setbar{display:flex;align-items:center;justify-content:space-between}
+.mini{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.addrow{display:flex;gap:10px;align-items:center;padding-top:12px}
+.pill-in{flex:1;min-width:0;font:inherit;font-size:15px;text-transform:none;height:34px;padding:0 14px;border:1px solid var(--soft);border-radius:999px;background:transparent;color:var(--ink)}
+.pill-in:focus{outline:none;border-color:var(--accent)}
+html.boho .pill-in:focus{border-color:var(--turq)}
+.arch{padding-top:14px}
+.chip.danger{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -265,7 +275,7 @@ const CYCLE=[['menstrual','menstrual'],['follicular','follicular'],['ovulation',
 const HOBBY_NAME=Object.fromEntries([...HOBBY_MAIN,...HOBBY_FUN]);
 
 const QUOTES=['The life of leisure is earned','Slow mornings, strong habits','Dolce far niente, after the checklist','Lock in now, lounge later','Postcards from your best self','Show up like it’s summer on the coast'];
-const QUOTES_DAY=[["we are busy so that we may have leisure.", "aristotle"], ["well begun is half done.", "aristotle"], ["happiness depends upon ourselves.", "aristotle"], ["while we are postponing, life speeds by.", "seneca"], ["it is not that we have a short time to live, but that we waste a lot of it.", "seneca"], ["we suffer more often in imagination than in reality.", "seneca"], ["waste no more time arguing about what a good person should be. be one.", "marcus aurelius"], ["what stands in the way becomes the way.", "marcus aurelius"], ["first say to yourself what you would be; and then do what you have to do.", "epictetus"], ["no one is free who is not master of themselves.", "epictetus"], ["how we spend our days is, of course, how we spend our lives.", "annie dillard"], ["small deeds done are better than great deeds planned.", "peter marshall"], ["almost everything will work again if you unplug it for a few minutes, including you.", "anne lamott"], ["rest is not idleness.", "john lubbock"], ["the best time to plant a tree was twenty years ago. the second best time is now.", "proverb"], ["motivation is what gets you started. habit is what keeps you going.", "jim ryun"], ["a year from now you may wish you had started today.", "karen lamb"], ["be not afraid of going slowly; be afraid only of standing still.", "chinese proverb"], ["she believed she could, so she did.", "r.s. grey"], ["dolce far niente. the sweetness of doing nothing.", "italian saying"], ["adopt the pace of nature: her secret is patience.", "ralph waldo emerson"], ["you will never change your life until you change something you do daily.", "john c. maxwell"], ["it does not matter how slowly you go as long as you do not stop.", "confucius"], ["the life of leisure is earned.", "beck"]];
+const QUOTES_DAY=[["be impeccable with your word.", "the four agreements"], ["don’t take anything personally.", "the four agreements"], ["don’t make assumptions.", "the four agreements"], ["always do your best. your best changes from moment to moment, and that’s okay.", "the four agreements"], ["what others say and do is a projection of their own reality, not yours.", "the four agreements"], ["i am becoming the woman i’ve been praying for.", ""], ["everything i want is already on its way to me.", ""], ["my habits are building the life i’m dreaming of.", ""], ["i don’t chase. i attract. what belongs to me will find me.", ""], ["i am allowed to take up space and slow down.", ""], ["the energy i bring today shapes the life i live tomorrow.", ""], ["small, steady steps. she’s getting there.", ""], ["i am calm, i am capable, i am becoming.", ""], ["good things flow to me easily.", ""], ["i show up for myself, even on the slow days.", ""], ["my peace is a priority, not a reward.", ""], ["i choose thoughts that make me feel good.", ""], ["what i focus on grows. i focus on what i love.", ""], ["i am the main character of a soft, beautiful life.", ""], ["discipline today, ease tomorrow.", ""], ["i release what i can’t control and pour into what i can.", ""], ["abundance is my natural state.", ""], ["i trust the timing of my life.", ""], ["every day i keep a promise to myself, i believe in me a little more.", ""], ["i am proud of how far i’ve come.", ""], ["she remembered who she was, and the game changed.", ""], ["i am worthy of the life i’m creating.", ""], ["today i choose joy, ease and intention.", ""], ["the life of leisure is earned.", ""]];
 const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const FULLDOW=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -341,7 +351,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-8';
+const APP_VERSION='2026-10-22-9';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -413,9 +423,10 @@ function syncText(){return{local:'saving on this device',loading:'syncing…',sa
 
 /* ---------- habits (built-in + your own) ---------- */
 function cfg(){const c=state.cfg||{};c.custom=c.custom||{};c.custom.morning=c.custom.morning||[];c.custom.night=c.custom.night||[];c.hidden=c.hidden||[];c.custom.hobbies=c.custom.hobbies||[];return c}
-function hobbyList(){const c=cfg();return [...HOBBY_MAIN,...HOBBY_FUN].filter(h=>!c.hidden.includes(h[0])).concat(c.custom.hobbies.map(x=>[x.k,x.label]))}
+function allOf(sec){const c=cfg(),base=sec==='hobbies'?[...HOBBY_MAIN,...HOBBY_FUN]:sec==='morning'?MORNING:NIGHT;return base.concat(c.custom[sec].map(x=>[x.k,x.label]))}
+function hobbyList(){const c=cfg();return allOf('hobbies').filter(h=>!c.hidden.includes(h[0]))}
 function hobbyName(k){const f=[...HOBBY_MAIN,...HOBBY_FUN].find(h=>h[0]===k)||cfg().custom.hobbies.map(x=>[x.k,x.label]).find(h=>h[0]===k);return f?f[1]:k}
-function list(sec){const c=cfg(),base=sec==='morning'?MORNING:NIGHT;return base.filter(h=>!c.hidden.includes(h[0])).concat(c.custom[sec].map(x=>[x.k,x.label]))}
+function list(sec){const c=cfg();return allOf(sec).filter(h=>!c.hidden.includes(h[0]))}
 function saveCfg(){lsSet('lol.cfg',state.cfg);cfgDirty=true;lsSet('lol.cfgDirty',true);flushCfg()}
 async function flushCfg(){
   if(!sb||!user||!cfgDirty)return;
@@ -428,31 +439,20 @@ async function flushCfg(){
 const CHECK='<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5.3l2.1 2.1L8 2.8" stroke="#F7F3EC" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function header(){
   const qi=quarterInfo(state.tab==='week'?state.week:todayIso());
-  return '<header class="top"><div class="caps">'+longDate(todayIso())+'</div><div class="wordmark">life of leisure</div><div class="caps tagline">the life of leisure is earned</div><div class="caps qline">q'+qi.q+' · week '+qi.wk+' of '+qi.total+'</div></header>';
+  return '<header class="top"><button class="menubtn" data-act="settings" aria-label="menu"><svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><path d="M1 1h20M1 7h20M5 13h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><div class="caps">'+longDate(todayIso())+'</div><div class="wordmark">life of leisure</div><div class="caps tagline">the life of leisure is earned</div><div class="caps qline">q'+qi.q+' · week '+qi.wk+' of '+qi.total+'</div></header>';
 }
 function greeting(){const h=new Date().getHours();return h<12?'good morning':h<17?'good afternoon':'good evening'}
 function habitRow(key,label,date,sub){
   const on=!!dayChecks(date)[key];
   return '<button class="row'+(on?' on':'')+'" data-act="habit" data-k="'+esc(key)+'" aria-pressed="'+on+'"><span class="mark">'+CHECK+'</span><span><span class="lbl">'+esc(label)+'</span>'+(sub?'<br><span class="sub">'+esc(sub)+'</span>':'')+'</span></button>';
 }
-function editRow(key,label,sec){
-  return '<div class="row"><span class="lbl" style="flex:1">'+esc(label)+'</span><button class="sub" data-act="rmhabit" data-sec="'+sec+'" data-k="'+esc(key)+'" aria-label="remove '+esc(label)+'">remove</button></div>';
-}
 function section(title,en,sec,date){
-  const items=list(sec),c=dayChecks(date),n=items.filter(h=>c[h[0]]).length,editing=state.edit===sec;
-  let h='<section class="sec"><div class="sec-h"><div><div class="sec-t">'+title+'</div><div class="caps sec-s">'+en+'</div></div><div style="text-align:right"><div class="caps">'+n+' / '+items.length+'</div><button class="caps" style="color:var(--accent);margin-top:6px" data-act="edit" data-sec="'+sec+'">'+(editing?'done':'edit')+'</button></div></div>';
-  if(editing){
-    h+=items.map(x=>editRow(x[0],x[1],sec)).join('');
-    h+='<form class="group" data-sec="'+sec+'" id="add-'+sec+'"><label class="sub" for="new-'+sec+'">add your own</label><div style="display:flex;gap:10px;align-items:center"><input id="new-'+sec+'" class="note" style="min-height:0;flex:1" placeholder="'+(sec==='morning'?'stretch for 10 minutes':'read before bed')+'" autocomplete="off"><button type="submit" class="chip on">add</button></div>';
-    const hid=cfg().hidden.filter(k=>(sec==='morning'?MORNING:NIGHT).some(b=>b[0]===k));
-    if(hid.length)h+='<div class="fun-lbl">removed: '+hid.map(k=>'<button style="text-decoration:underline" data-act="restore" data-k="'+k+'">'+esc((sec==='morning'?MORNING:NIGHT).find(b=>b[0]===k)[1].toLowerCase())+'</button>').join(', ')+' (tap to bring back)</div>';
-    h+='</form>';
-  }else h+=items.map(x=>habitRow(x[0],x[1],date)).join('');
-  return h+'</section>';
+  const items=list(sec),c=dayChecks(date),n=items.filter(h=>c[h[0]]).length;
+  return '<section class="sec"><div class="sec-h"><div><div class="sec-t">'+title+'</div><div class="caps sec-s">'+en+'</div></div><div class="caps">'+n+' / '+items.length+'</div></div>'+items.map(x=>habitRow(x[0],x[1],date)).join('')+'</section>';
 }
 function chip(act,key,label,on){return '<button class="chip'+(on?' on':'')+'" data-act="'+act+'" data-k="'+key+'" aria-pressed="'+on+'">'+esc(label)+'</button>'}
 function aiLine(d){
-  const a=state.ai[d];
+  const a=(day(d).foodNote||'').trim()?state.ai[d]:null;
   if(!a||!FOOD_BY[a.rating])return '<div class="ai empty"><span class="ai-w">updates at 8:30</span></div>';
   return '<div class="ai"><span class="ai-r">'+esc(FOOD_BY[a.rating][1].toLowerCase())+'</span><span class="ai-w">'+esc(a.why)+'</span></div>';
 }
@@ -478,13 +478,8 @@ function renderToday(){
   h+=section('night','habits','night',d);
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">also today</div><div class="caps sec-s">weekly goals</div></div></div>';
   h+='<div class="group"><div class="group-h"><span class="lbl">workouts</span><span class="sub">'+ws.fit+' of '+ws.targets.fitness+' this week</span></div><div class="chips">'+WORKOUTS.map(o=>chip('workout',o[0],o[1],w.includes(o[0]))).join('')+'</div></div>';
-  {const ed=state.edit==='hobbies',HL=hobbyList();
-  h+='<div class="group"><div class="group-h"><span class="lbl">hobbies</span><span class="sub">'+ws.hobby+' of '+ws.targets.hobby+' this week · <button style="color:var(--accent);font-style:normal;letter-spacing:.2em;font-size:10.5px;text-transform:uppercase" data-act="edit" data-sec="hobbies">'+(ed?'done':'edit')+'</button></span></div>';
-  if(ed){h+=HL.map(o=>editRow(o[0],o[1],'hobbies')).join('')+'<form data-sec="hobbies" id="add-hobbies" style="display:flex;gap:10px;align-items:center"><input id="new-hobbies" class="note" style="min-height:0;flex:1" placeholder="pottery" autocomplete="off" aria-label="add a hobby"><button type="submit" class="chip on">add</button></form>';
-    const hid=cfg().hidden.filter(k=>[...HOBBY_MAIN,...HOBBY_FUN].some(b=>b[0]===k));
-    if(hid.length)h+='<div class="fun-lbl">removed: '+hid.map(k=>'<button style="text-decoration:underline" data-act="restore" data-k="'+k+'">'+esc(hobbyName(k).toLowerCase())+'</button>').join(', ')+' (tap to bring back)</div>';}
-  else h+='<div class="chips">'+HL.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div>';
-  h+='</div></section>';}
+  {const HL=hobbyList();
+  h+='<div class="group"><div class="group-h"><span class="lbl">hobbies</span><span class="sub">'+ws.hobby+' of '+ws.targets.hobby+' this week</span></div><div class="chips">'+HL.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div></div></section>';}
   const n=dayCount(d),T=dailyTotal();
   h+='<div class="quote">'+(posted(d)?'every box checked. good night.':n===0?'a blank page. begin.':(T-n)+' left today')+'</div>';
   return h;
@@ -563,13 +558,13 @@ function renderHistory(){
   for(let i=0;i<lead;i++)cells+='<div></div>';
   for(let i=1;i<=dim;i++){const d=y+'-'+pad(m)+'-'+pad(i),fut=d>t,n=dayCount(d);
     cells+='<button class="cday'+(fut?' future':'')+(d===t?' today':'')+(posted(d)?' posted':(!fut&&n>0?' some':''))+'" data-act="open" data-date="'+d+'"'+(fut?' disabled':'')+' aria-label="'+nice(d)+', '+n+' of '+dailyTotal()+'"><span class="n">'+i+'</span></button>'}
-  let h='<section class="sec"><div class="sec-h" style="align-items:center"><button class="navbtn" data-act="month" data-d="-1" aria-label="previous month">‹</button><div style="text-align:center"><div class="sec-t">'+MONTHS[m-1].toLowerCase()+'</div><div class="caps sec-s">'+y+'</div></div><button class="navbtn" data-act="month" data-d="1" aria-label="next month"'+(state.month>=t.slice(0,7)?' disabled':'')+'>›</button></div><div class="cal">'+cells+'</div><div class="legend"><span><b class="lg-all">bold</b> · every habit done</span><span><span class="lg-some">color</span> · some habits done</span></div></section>';
-  const weeks=[];let w=mondayOf(t);const stop=mondayOf(APP_START);
+  let h='<section class="sec"><div class="sec-h" style="align-items:center"><button class="navbtn" data-act="month" data-d="-1" aria-label="previous month">‹</button><div style="text-align:center"><div class="sec-t">'+MONTHS[m-1].toLowerCase()+'</div><div class="caps sec-s">'+y+'</div></div><button class="navbtn" data-act="month" data-d="1" aria-label="next month"'+(state.month>=t.slice(0,7)?' disabled':'')+'>›</button></div><div class="cal">'+cells+'</div></section>';
+  const weeks=[];let w=mondayOf(t);const stop=mondayOf(startDate());
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
   if(weeks.length)h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">weekly scorecards</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk),mm=Object.values(s.met).filter(Boolean).length;
     return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span><span class="caps">'+mm+' / 4 goals</span></div><div class="sc-row">workouts '+s.fit+'/5 · clean '+s.diet+'/5 · hobbies '+s.hobby+'/5 · spiritual '+s.spirit+'/7</div></button>'}).join('')+'</section>';
   {const q=QUOTES_DAY[(Math.floor((parse(t)-new Date(parse(t).getFullYear(),0,0))/864e5))%QUOTES_DAY.length];
-   h+='<section class="about-box qbox"><div class="caps">today’s quote</div><p class="aristotle">“'+q[0]+'”<br><span class="who">'+q[1]+'</span></p></section>';}
+   h+='<section class="about-box qbox"><div class="caps">today’s quote</div><p class="aristotle">'+q[0]+(q[1]?'<br><span class="who">'+q[1]+'</span>':'')+'</p></section>';}
   return h;
 }
 function monthNav(key,title,sub){const cur=state[key],t=todayIso(),[y,m]=cur.split('-').map(Number);
@@ -593,7 +588,7 @@ function renderFood(){
 function renderBody(){
   const d=state.date,x=day(d);
   let h=dayBar(d);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">body</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="tap to add" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">body</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
   const[y,m]=state.bmonth.split('-').map(Number),dim=new Date(y,m,0).getDate(),wd=monthDays(state.bmonth).filter(k=>day(k).weight!=null);
   const avgOf=ks=>ks.length?Math.round(ks.reduce((a,k)=>a+ +day(k).weight,0)/ks.length*10)/10:null;
   const pm=new Date(y,m-2,1),prev=monthDays(pm.getFullYear()+'-'+pad(pm.getMonth()+1)).filter(k=>day(k).weight!=null),pa=avgOf(prev);
@@ -607,6 +602,37 @@ function renderBody(){
     h+=wd.slice().reverse().map(k=>{const z=day(k);return '<button class="wrow" data-act="open" data-to="body" data-date="'+k+'"><span class="caps" style="width:74px;text-align:left">'+nice(k).split(', ')[0]+' '+(+k.slice(8))+'</span><span class="lbl">'+esc(z.weight)+'</span><span class="sub" style="margin-left:auto">'+(z.cycle||'')+'</span></button>'}).join('');}
   return h+'</section>';
 }
+function manageList(sec,title){
+  const c=cfg(),all=allOf(sec),on=all.filter(h=>!c.hidden.includes(h[0])),off=all.filter(h=>c.hidden.includes(h[0]));
+  const ph={morning:'stretch for 10 minutes',night:'read before bed',hobbies:'pottery'}[sec];
+  let h='<section class="sec"><div class="sec-h"><div class="sec-t">'+title+'</div><div class="caps">'+on.length+' active</div></div>';
+  h+=on.map(x=>'<div class="row"><span class="lbl" style="flex:1">'+esc(x[1].toLowerCase())+'</span><button class="mini" data-act="archive" data-k="'+esc(x[0])+'">archive</button></div>').join('');
+  h+='<form class="addrow" data-sec="'+sec+'" id="add-'+sec+'"><input id="new-'+sec+'" class="pill-in" placeholder="add: '+ph+'" autocomplete="off" aria-label="add to '+title+'"><button type="submit" class="chip on">add</button></form>';
+  if(off.length)h+='<div class="arch"><div class="caps">archived</div><div class="chips" style="margin-top:8px">'+off.map(x=>'<button class="chip" data-act="restore" data-k="'+esc(x[0])+'">'+esc(x[1].toLowerCase())+' ＋</button>').join('')+'</div></div>';
+  return h+'</section>';
+}
+function renderSettings(){
+  const t=todayIso(),cd=state.clearDate||t,cs=state.clearState,rs=state.resetState;
+  let h='<div class="setbar"><button class="today-link" data-act="closeset">‹ back</button><div class="sec-t">settings</div><span style="width:44px"></span></div>';
+  h+=manageList('morning','morning habits')+manageList('night','night habits')+manageList('hobbies','hobbies');
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">clear a day</div><div class="caps sec-s">weigh-ins and cycle always stay</div></div></div><div class="group"><div class="addrow"><input type="date" id="clear-date" class="pill-in" max="'+t+'" value="'+cd+'" aria-label="day to clear"><button class="chip'+(cs==='confirm'?' on danger':'')+'" data-act="clearday">'+(cs==='confirm'?'tap again to clear':'clear')+'</button></div>'+(cs==='done'?'<div class="sub">'+nice(state.clearedDate).toLowerCase()+' is cleared.</div>':'')+'</div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">start over</div><div class="caps sec-s">clears every day and week · weigh-ins stay</div></div></div><div class="group"><div><button class="chip'+(rs==='confirm'?' on danger':'')+'" data-act="resetall">'+(rs==='confirm'?'tap again to start over':rs==='working'?'clearing…':'start over')+'</button></div>'+(rs==='done'?'<div class="sub">a clean page. starting today.</div>':rs==='error'?'<div class="sub">that didn’t go through. check your connection and try again.</div>':'')+'</div></section>';
+  h+='<section class="sec"><div class="sec-h"><div class="sec-t">account</div></div><div class="group"><div><button class="chip" data-act="signout">sign out</button></div></div></section>';
+  return h;
+}
+function keepOnly(d){const x=state.days[d]||{},k={date:d};if(x.weight!=null)k.weight=x.weight;if(x.cycle)k.cycle=x.cycle;return k}
+function clearDay(d){clearTimeout(timers['days'+d]);state.days[d]=keepOnly(d);lsSet('lol.days',state.days);queueSave('days',d,state.days[d],pendingDays)}
+async function startOver(){
+  state.resetState='working';render();
+  Object.keys(state.days).forEach(d=>{clearTimeout(timers['days'+d]);state.days[d]=keepOnly(d);dirty.days[d]=1});
+  lsSet('lol.days',state.days);lsSet('lol.dirty',dirty);
+  Object.keys(state.weeks).forEach(k=>{delete dirty.weeks[k]});state.weeks={};lsSet('lol.weeks',{});
+  const c=cfg();c.start=todayIso();state.cfg=c;saveCfg();
+  try{if(sb&&user){const r=await sb.from('weeks').delete().eq('user_id',user.id);if(r.error)throw r.error}flushAll();state.resetState='done'}catch(e){console.warn(e);state.resetState='error'}
+  render();
+}
+function startDate(){const c=cfg();return c.start&&c.start>APP_START?c.start:APP_START}
+
 function renderLogin(){
   return '<header class="top" style="padding-top:40px"><div class="wordmark">life of leisure</div><div class="caps tagline">the life of leisure is earned</div></header><form class="login" id="login"><div class="sec-t">welcome</div><label for="login-email" class="caps">email</label><input id="login-email" type="email" autocomplete="username" required><label for="login-pw" class="caps">password</label><input id="login-pw" type="password" autocomplete="current-password" required>'+(loginErr?'<div class="err">'+esc(loginErr)+'</div>':'')+'<button type="submit" class="chip on" style="align-self:flex-start;margin-top:8px">sign in</button><div class="sub">you only have to do this once on this phone.</div></form>';
 }
@@ -614,8 +640,8 @@ function render(){
   const app=document.getElementById('app'),tabsEl=document.querySelector('nav.tabs');
   if(authChecked&&!user){tabsEl.hidden=true;app.innerHTML=renderLogin();return}
   tabsEl.hidden=false;
-  const body=state.tab==='week'?renderWeek():state.tab==='history'?renderHistory():state.tab==='food'?renderFood():state.tab==='body'?renderBody():renderToday();
-  app.innerHTML=header()+body+'<div class="foot"><span id="sync">'+syncText()+'</span>'+(user?'<br><button class="signout" data-act="signout">sign out</button>':'')+'</div>';
+  const body=state.tab==='settings'?renderSettings():state.tab==='week'?renderWeek():state.tab==='history'?renderHistory():state.tab==='food'?renderFood():state.tab==='body'?renderBody():renderToday();
+  app.innerHTML=header()+body+'<div class="foot"><span id="sync">'+syncText()+'</span></div>';
   document.getElementById('tabs').innerHTML=[['today','today'],['food','food'],['body','body'],['week','week'],['history','history']].map(t=>'<button class="'+(state.tab===t[0]?'on':'')+'" data-act="tab" data-t="'+t[0]+'" aria-current="'+(state.tab===t[0]?'page':'false')+'"><span class="it">'+t[1]+'</span></button>').join('');
 }
 
@@ -634,9 +660,12 @@ document.addEventListener('click',e=>{
   else if(a==='week'){state.week=add(state.week,+b.dataset.d)}
   else if(a==='month'){const key=b.dataset.k||'month',[y,m]=state[key].split('-').map(Number),n=new Date(y,m-1+(+b.dataset.d),1);state[key]=n.getFullYear()+'-'+pad(n.getMonth()+1)}
   else if(a==='open'){state.date=b.dataset.date;state.tab=b.dataset.to||'today';window.scrollTo(0,0)}
-  else if(a==='signout'){if(sb)sb.auth.signOut();user=null;state.days={};state.weeks={};lsSet('lol.days',{});lsSet('lol.weeks',{});}
-  else if(a==='edit'){state.edit=state.edit===b.dataset.sec?null:b.dataset.sec}
-  else if(a==='rmhabit'){const c=cfg(),sec=b.dataset.sec,k=b.dataset.k;const ci=c.custom[sec].findIndex(x=>x.k===k);if(ci>=0)c.custom[sec].splice(ci,1);else if(!c.hidden.includes(k))c.hidden.push(k);state.cfg=c;saveCfg()}
+  else if(a==='signout'){if(sb)sb.auth.signOut();user=null;state.tab='today';state.days={};state.weeks={};lsSet('lol.days',{});lsSet('lol.weeks',{});}
+  else if(a==='settings'){state.prevTab=state.tab==='settings'?state.prevTab:state.tab;state.tab='settings';state.clearState=null;state.resetState=null;window.scrollTo(0,0)}
+  else if(a==='closeset'){state.tab=state.prevTab||'today';window.scrollTo(0,0)}
+  else if(a==='archive'){const c=cfg(),k=b.dataset.k;if(!c.hidden.includes(k))c.hidden.push(k);state.cfg=c;saveCfg()}
+  else if(a==='clearday'){const el=document.getElementById('clear-date'),v=el&&el.value;if(!v||v>todayIso())return;state.clearDate=v;if(state.clearState==='confirm'){clearDay(v);state.clearedDate=v;state.clearState='done'}else state.clearState='confirm'}
+  else if(a==='resetall'){if(state.resetState==='working')return;if(state.resetState==='confirm'){startOver();return}state.resetState='confirm'}
   else if(a==='restore'){const c=cfg();c.hidden=c.hidden.filter(k=>k!==b.dataset.k);state.cfg=c;saveCfg()}
   else if(a==='openweek'){state.week=b.dataset.w;state.tab='week';window.scrollTo(0,0)}
   else return;
@@ -645,7 +674,7 @@ document.addEventListener('click',e=>{
 
 let deferred=false;
 function safeRender(){const ae=document.activeElement;if(ae&&(ae.id==='food-note'||ae.id==='weight')){deferred=true;return}render()}
-document.addEventListener('input',e=>{if(e.target.id==='weight'){const v=e.target.value.replace(/[^0-9.]/g,'');const n=parseFloat(v);setDay(state.date,x=>{if(v&&!isNaN(n))x.weight=Math.round(n*10)/10;else delete x.weight});return}if(e.target.id==='food-note'){const v=e.target.value;setDay(state.date,x=>{x.foodNote=v})}});
+document.addEventListener('input',e=>{if(e.target.id==='clear-date'){state.clearDate=e.target.value;if(state.clearState){state.clearState=null;render()}return}if(e.target.id==='weight'){const v=e.target.value.replace(/[^0-9.]/g,'');const n=parseFloat(v);setDay(state.date,x=>{if(v&&!isNaN(n))x.weight=Math.round(n*10)/10;else delete x.weight});return}if(e.target.id==='food-note'){const v=e.target.value;setDay(state.date,x=>{x.foodNote=v})}});
 document.addEventListener('focusout',e=>{if((e.target.id==='food-note'||e.target.id==='weight')&&deferred){deferred=false;setTimeout(render,0)}});
 let lastDay=todayIso();
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;if(todayIso()!==lastDay){if(state.date===lastDay)state.date=todayIso();lastDay=todayIso();render()}checkForUpdate();if(user)sync()});
