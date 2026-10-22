@@ -1,6 +1,6 @@
 {
-  "name": "life of leisure",
-  "short_name": "Vita",
+  "name": "Mesa",
+  "short_name": "Mesa",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

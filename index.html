@@ -7,12 +7,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Vita">
+<meta name="apple-mobile-web-app-title" content="Mesa">
 <meta name="theme-color" content="#2B2622">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="vita-icon-180.png">
 <link rel="icon" type="image/png" href="vita-icon-192.png">
-<title>Life of Leisure</title>
+<title>Mesa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Bodoni+Moda:wght@400;500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
@@ -191,7 +191,7 @@ html.boho .topbar{background:var(--leather)}
 html.boho header.top{background:var(--leather);color:#F7EFE6;padding:26px 16px 22px;border-bottom:3px solid var(--turq)}
 html.boho header.top .caps{color:#CDB8A6}
 html.boho header.top .tagline{color:var(--turq-l)}
-html.boho .wordmark{font-family:var(--serif);font-style:normal;font-weight:400;font-size:31px;letter-spacing:.04em}
+html.boho .wordmark{font-family:var(--serif);font-style:normal;font-weight:400;font-size:36px;letter-spacing:.12em}
 html.boho .caps{font-family:var(--sans);letter-spacing:.22em;font-weight:400}
 html.boho .sec-t{font-family:var(--serif);font-style:normal;font-weight:400;font-size:23px;color:var(--leather);letter-spacing:.01em}
 html.boho .sec-h{border-bottom:1px solid var(--soft);padding-bottom:10px}
@@ -351,7 +351,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-9';
+const APP_VERSION='2026-10-22-10';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -439,7 +439,7 @@ async function flushCfg(){
 const CHECK='<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5.3l2.1 2.1L8 2.8" stroke="#F7F3EC" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function header(){
   const qi=quarterInfo(state.tab==='week'?state.week:todayIso());
-  return '<header class="top"><button class="menubtn" data-act="settings" aria-label="menu"><svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><path d="M1 1h20M1 7h20M5 13h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><div class="caps">'+longDate(todayIso())+'</div><div class="wordmark">life of leisure</div><div class="caps tagline">the life of leisure is earned</div><div class="caps qline">q'+qi.q+' · week '+qi.wk+' of '+qi.total+'</div></header>';
+  return '<header class="top"><button class="menubtn" data-act="settings" aria-label="menu"><svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><path d="M1 1h20M1 7h20M5 13h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><div class="caps">'+longDate(todayIso())+'</div><div class="wordmark">mesa</div><div class="caps tagline">the life of leisure is earned</div><div class="caps qline">q'+qi.q+' · week '+qi.wk+' of '+qi.total+'</div></header>';
 }
 function greeting(){const h=new Date().getHours();return h<12?'good morning':h<17?'good afternoon':'good evening'}
 function habitRow(key,label,date,sub){
@@ -634,7 +634,7 @@ async function startOver(){
 function startDate(){const c=cfg();return c.start&&c.start>APP_START?c.start:APP_START}
 
 function renderLogin(){
-  return '<header class="top" style="padding-top:40px"><div class="wordmark">life of leisure</div><div class="caps tagline">the life of leisure is earned</div></header><form class="login" id="login"><div class="sec-t">welcome</div><label for="login-email" class="caps">email</label><input id="login-email" type="email" autocomplete="username" required><label for="login-pw" class="caps">password</label><input id="login-pw" type="password" autocomplete="current-password" required>'+(loginErr?'<div class="err">'+esc(loginErr)+'</div>':'')+'<button type="submit" class="chip on" style="align-self:flex-start;margin-top:8px">sign in</button><div class="sub">you only have to do this once on this phone.</div></form>';
+  return '<header class="top" style="padding-top:40px"><div class="wordmark">mesa</div><div class="caps tagline">the life of leisure is earned</div></header><form class="login" id="login"><div class="sec-t">welcome</div><label for="login-email" class="caps">email</label><input id="login-email" type="email" autocomplete="username" required><label for="login-pw" class="caps">password</label><input id="login-pw" type="password" autocomplete="current-password" required>'+(loginErr?'<div class="err">'+esc(loginErr)+'</div>':'')+'<button type="submit" class="chip on" style="align-self:flex-start;margin-top:8px">sign in</button><div class="sub">you only have to do this once on this phone.</div></form>';
 }
 function render(){
   const app=document.getElementById('app'),tabsEl=document.querySelector('nav.tabs');
