@@ -251,7 +251,7 @@ html.boho .pill-in:focus{border-color:var(--turq)}
 .arch{padding-top:14px}
 .chip.danger{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
 .del-on{color:#fff!important;background:var(--accent);border-radius:999px;padding:3px 10px}
-.spills{display:flex;flex-wrap:wrap;gap:6px;padding-top:10px}
+.spills{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding-top:10px}
 .spill{font-size:12px;line-height:1;padding:6px 11px;border:1px solid var(--soft);border-radius:999px;color:var(--ink);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -357,7 +357,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-20';
+const APP_VERSION='2026-10-22-21';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
