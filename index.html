@@ -255,6 +255,14 @@ html.boho .pill-in:focus{border-color:var(--turq)}
 .spill{font-size:12px;line-height:1;padding:6px 11px;border:1px solid var(--soft);border-radius:999px;color:var(--ink);white-space:nowrap}
 .more{display:block;margin:12px auto 0;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
 html.boho .more{color:var(--turq)}
+.cday{gap:1px}
+.hm{height:6px;display:flex;justify-content:center}
+.hm i{display:block;width:6px;height:6px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--turq,#3E9E96)}
+.hm i.hp{background:#8B6BB8}
+.hkey{display:flex;justify-content:center;gap:16px;margin-top:8px;font-size:12px;color:var(--muted)}
+.hkey i{display:inline-block;width:6px;height:6px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--turq,#3E9E96);margin-right:6px;vertical-align:1px}
+.hkey i.hp{background:#8B6BB8}
+.row.ren{gap:10px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -359,7 +367,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-22-22';
+const APP_VERSION='2026-10-25-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -431,9 +439,9 @@ function syncText(){return{local:'saving on this device',loading:'syncing…',sa
 
 /* ---------- habits (built-in + your own) ---------- */
 function cfg(){const c=state.cfg||{};c.custom=c.custom||{};c.custom.morning=c.custom.morning||[];c.custom.night=c.custom.night||[];c.hidden=c.hidden||[];c.custom.hobbies=c.custom.hobbies||[];return c}
-function allOf(sec){const c=cfg(),del=c.deleted||[],base=sec==='hobbies'?[...HOBBY_MAIN,...HOBBY_FUN]:sec==='morning'?MORNING:NIGHT;return base.filter(h=>!del.includes(h[0])).concat(c.custom[sec].map(x=>[x.k,x.label]))}
+function allOf(sec){const c=cfg(),del=c.deleted||[],lb=c.labels||{},base=sec==='hobbies'?[...HOBBY_MAIN,...HOBBY_FUN]:sec==='morning'?MORNING:NIGHT;return base.filter(h=>!del.includes(h[0])).map(h=>[h[0],lb[h[0]]||h[1]]).concat(c.custom[sec].map(x=>[x.k,x.label]))}
 function hobbyList(){const c=cfg();return allOf('hobbies').filter(h=>!c.hidden.includes(h[0]))}
-function hobbyName(k){const f=[...HOBBY_MAIN,...HOBBY_FUN].find(h=>h[0]===k)||cfg().custom.hobbies.map(x=>[x.k,x.label]).find(h=>h[0]===k);return f?f[1]:k}
+function hobbyName(k){const lb=cfg().labels||{};if(lb[k])return lb[k];const f=[...HOBBY_MAIN,...HOBBY_FUN].find(h=>h[0]===k)||cfg().custom.hobbies.map(x=>[x.k,x.label]).find(h=>h[0]===k);return f?f[1]:k}
 function list(sec){const c=cfg();return allOf(sec).filter(h=>!c.hidden.includes(h[0]))}
 function saveCfg(){lsSet('lol.cfg',state.cfg);cfgDirty=true;lsSet('lol.cfgDirty',true);flushCfg()}
 async function flushCfg(){
@@ -565,8 +573,8 @@ function renderHistory(){
   let cells=['M','T','W','T','F','S','S'].map(x=>'<div class="dow">'+x+'</div>').join('');
   for(let i=0;i<lead;i++)cells+='<div></div>';
   for(let i=1;i<=dim;i++){const d=y+'-'+pad(m)+'-'+pad(i),fut=d>t,n=dayCount(d);
-    cells+='<button class="cday'+(fut?' future':'')+(d===t?' today':'')+(posted(d)?' posted':(!fut&&n>0?' some':''))+'" data-act="open" data-date="'+d+'"'+(fut?' disabled':'')+' aria-label="'+nice(d)+', '+n+' of '+dailyTotal()+'"><span class="n">'+i+'</span></button>'}
-  let h='<section class="sec"><div class="sec-h" style="align-items:center"><button class="navbtn" data-act="month" data-d="-1" aria-label="previous month">‹</button><div style="text-align:center"><div class="sec-t">'+MONTHS[m-1].toLowerCase()+'</div><div class="caps sec-s">'+y+'</div></div><button class="navbtn" data-act="month" data-d="1" aria-label="next month"'+(state.month>=t.slice(0,7)?' disabled':'')+'>›</button></div><div class="cal">'+cells+'</div></section>';
+    cells+='<button class="cday'+(fut?' future':'')+(d===t?' today':'')+(posted(d)?' posted':(!fut&&n>0?' some':''))+'" data-act="open" data-date="'+d+'"'+(fut?' disabled':'')+' aria-label="'+nice(d)+', '+n+' of '+dailyTotal()+'"><span class="n">'+i+'</span><span class="hm">'+((day(d).hair||{}).wash?'<i class="hw'+((day(d).hair||{}).purple?' hp':'')+'"></i>':'')+'</span></button>'}
+  let h='<section class="sec"><div class="sec-h" style="align-items:center"><button class="navbtn" data-act="month" data-d="-1" aria-label="previous month">‹</button><div style="text-align:center"><div class="sec-t">'+MONTHS[m-1].toLowerCase()+'</div><div class="caps sec-s">'+y+'</div></div><button class="navbtn" data-act="month" data-d="1" aria-label="next month"'+(state.month>=t.slice(0,7)?' disabled':'')+'>›</button></div><div class="cal">'+cells+'</div>'+(Object.keys(state.days).some(k=>k.slice(0,7)===state.month&&state.days[k].hair&&state.days[k].hair.wash)?'<div class="hkey"><span><i></i>wash day</span><span><i class="hp"></i>purple shampoo</span></div>':'')+'</section>';
   const weeks=[];let w=mondayOf(t);const stop=mondayOf(startDate());
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
   if(weeks.length)h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">weekly scorecards</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk),mm=Object.values(s.met).filter(Boolean).length;
@@ -593,10 +601,11 @@ function renderFood(){
   h+=tot?'<div class="fbar">'+FOOD.map(f=>cnt[f[0]]?'<i style="width:'+(cnt[f[0]]/tot*100)+'%;background:'+shade[f[0]]+'"></i>':'').join('')+'</div><div class="tally">'+FOOD.map(f=>f[1].toLowerCase()+' '+Math.round(cnt[f[0]]/tot*100)+'%').join(' · ')+'</div><div class="sub" style="margin-top:6px">'+(slipDays.length?'“could be better” lands most on '+slipDays.map(z=>z.toLowerCase()+'s').join(' and ')+'.':'no “could be better” days this month.')+'</div>':'<div class="sub" style="padding-top:12px">no rated days this month.</div>';
   return h+'</section>';
 }
+function hairLast(d){const ks=Object.keys(state.days).filter(k=>k<d&&state.days[k]&&state.days[k].hair&&state.days[k].hair.wash).sort();if(!ks.length)return '';const l=ks[ks.length-1],n=Math.round((parse(d)-parse(l))/864e5);return 'last wash '+(n===1?'yesterday':n+' days ago')}
 function renderBody(){
   const d=state.date,x=day(d);
   let h=dayBar(d);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">body</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">body</div><div class="caps sec-s">today’s log</div></div></div><div class="group"><div class="group-h"><span class="lbl">weight</span><span class="sub">lbs</span></div><input id="weight" class="note wt" type="text" inputmode="decimal" autocomplete="off" aria-label="weight in pounds" placeholder="" value="'+(x.weight!=null?esc(x.weight):'')+'"></div><div class="group"><div class="group-h"><span class="lbl">cycle</span><span class="sub">where you are</span></div><div class="chips">'+CYCLE.map(c=>chip('cycle',c[0],c[1],x.cycle===c[0])).join('')+'</div></div><div class="group"><div class="group-h"><span class="lbl">hair</span><span class="sub">'+hairLast(d)+'</span></div><div class="chips">'+chip('hair','wash','wash day',!!(x.hair&&x.hair.wash))+chip('hair','purple','purple shampoo',!!(x.hair&&x.hair.purple))+'</div></div></section>';
   const[y,m]=state.bmonth.split('-').map(Number),dim=new Date(y,m,0).getDate(),wd=monthDays(state.bmonth).filter(k=>day(k).weight!=null);
   const avgOf=ks=>ks.length?Math.round(ks.reduce((a,k)=>a+ +day(k).weight,0)/ks.length*10)/10:null;
   const pm=new Date(y,m-2,1),prev=monthDays(pm.getFullYear()+'-'+pad(pm.getMonth()+1)).filter(k=>day(k).weight!=null),pa=avgOf(prev);
@@ -616,7 +625,7 @@ function manageList(sec,title){
   const c=cfg(),all=allOf(sec),on=all.filter(h=>!c.hidden.includes(h[0])),off=all.filter(h=>c.hidden.includes(h[0]));
   const ph={morning:'stretch for 10 minutes',night:'read before bed',hobbies:'pottery'}[sec];
   let h='<section class="sec"><div class="sec-h"><div class="sec-t">'+title+'</div><div class="caps">'+on.length+' active</div></div>';
-  h+=on.map(x=>'<div class="row"><span class="lbl" style="flex:1">'+esc(x[1].toLowerCase())+'</span><button class="mini" data-act="archive" data-k="'+esc(x[0])+'">archive</button></div>').join('');
+  h+=on.map(x=>state.renKey===x[0]?'<form class="row ren" id="ren-form" data-sec="'+sec+'" data-k="'+esc(x[0])+'"><input id="ren-in" class="pill-in" value="'+esc(x[1].toLowerCase())+'" autocomplete="off" aria-label="new name"><button type="submit" class="chip on">save</button></form>':'<div class="row"><button class="lbl" style="flex:1;text-align:left" data-act="rename" data-k="'+esc(x[0])+'">'+esc(x[1].toLowerCase())+'</button><button class="mini" data-act="rename" data-k="'+esc(x[0])+'">rename</button><button class="mini" style="margin-left:14px" data-act="archive" data-k="'+esc(x[0])+'">archive</button></div>').join('');
   h+='<form class="addrow" data-sec="'+sec+'" id="add-'+sec+'"><input id="new-'+sec+'" class="pill-in" placeholder="add: '+ph+'" autocomplete="off" aria-label="add to '+title+'"><button type="submit" class="chip on">add</button></form>';
   if(off.length)h+='<div class="arch"><div class="caps">archived</div>'+off.map(x=>{const cf=state.delKey===x[0];return '<div class="row"><span class="lbl" style="flex:1;color:var(--muted)">'+esc(x[1].toLowerCase())+'</span><button class="mini" style="color:var(--turq)" data-act="restore" data-k="'+esc(x[0])+'">restore</button><button class="mini'+(cf?' del-on':'')+'" style="margin-left:14px" data-act="delhabit" data-sec="'+sec+'" data-k="'+esc(x[0])+'">'+(cf?'tap to delete':'delete')+'</button></div>'}).join('')+'</div>';
   return h+'</section>';
@@ -632,7 +641,7 @@ function renderSettings(){
   h+='<section class="sec"><div class="sec-h"><div class="sec-t">account</div></div><div class="group"><div><button class="chip" data-act="signout">sign out</button></div></div></section>';
   return h;
 }
-function keepOnly(d){const x=state.days[d]||{},k={date:d};if(x.weight!=null)k.weight=x.weight;if(x.cycle)k.cycle=x.cycle;return k}
+function keepOnly(d){const x=state.days[d]||{},k={date:d};if(x.weight!=null)k.weight=x.weight;if(x.cycle)k.cycle=x.cycle;if(x.hair)k.hair=x.hair;return k}
 function clearDay(d){clearTimeout(timers['days'+d]);state.days[d]=keepOnly(d);lsSet('lol.days',state.days);queueSave('days',d,state.days[d],pendingDays)}
 async function startOver(){
   state.resetState='working';render();
@@ -673,12 +682,14 @@ document.addEventListener('click',e=>{
   else if(a==='month'){const key=b.dataset.k||'month',[y,m]=state[key].split('-').map(Number),n=new Date(y,m-1+(+b.dataset.d),1);state[key]=n.getFullYear()+'-'+pad(n.getMonth()+1)}
   else if(a==='open'){state.date=b.dataset.date;state.tab=b.dataset.to||'today';window.scrollTo(0,0)}
   else if(a==='signout'){if(sb)sb.auth.signOut();user=null;state.tab='today';state.days={};state.weeks={};lsSet('lol.days',{});lsSet('lol.weeks',{});}
-  else if(a==='settings'){state.delKey=null;state.delW=null;state.wN=10;state.prevTab=state.tab==='settings'?state.prevTab:state.tab;state.tab='settings';state.clearState=null;state.resetState=null;window.scrollTo(0,0)}
+  else if(a==='settings'){state.renKey=null;state.delKey=null;state.delW=null;state.wN=10;state.prevTab=state.tab==='settings'?state.prevTab:state.tab;state.tab='settings';state.clearState=null;state.resetState=null;window.scrollTo(0,0)}
   else if(a==='closeset'){state.tab=state.prevTab||'today';window.scrollTo(0,0)}
   else if(a==='delhabit'){const k=b.dataset.k,sec=b.dataset.sec;if(state.delKey!==k){state.delKey=k}else{const c=cfg();const ci=c.custom[sec].findIndex(x=>x.k===k);if(ci>=0){c.custom[sec].splice(ci,1);c.hidden=c.hidden.filter(x=>x!==k)}else{c.deleted=c.deleted||[];if(!c.deleted.includes(k))c.deleted.push(k)}state.delKey=null;state.cfg=c;saveCfg()}}
   else if(a==='delweight'){const d=b.dataset.date;if(state.delW!==d){state.delW=d}else{state.delW=null;setDay(d,x=>{delete x.weight})}}
   else if(a==='wall'){state.wAll=state.wAll===state.bmonth?null:state.bmonth}
   else if(a==='wolder'){state.wN=(state.wN||10)+10}
+  else if(a==='rename'){state.renKey=b.dataset.k;render();setTimeout(()=>{const i=document.getElementById('ren-in');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},0);return}
+  else if(a==='hair'){const k=b.dataset.k;setDay(d,x=>{const hr=Object.assign({},x.hair||{});hr[k]=!hr[k];if(k==='purple'&&hr.purple)hr.wash=true;if(k==='wash'&&!hr.wash)hr.purple=false;Object.keys(hr).forEach(z=>{if(!hr[z])delete hr[z]});if(Object.keys(hr).length)x.hair=hr;else delete x.hair})}
   else if(a==='archive'){const c=cfg(),k=b.dataset.k;if(!c.hidden.includes(k))c.hidden.push(k);state.cfg=c;saveCfg()}
   else if(a==='clearday'){const el=document.getElementById('clear-date'),v=el&&el.value;if(!v||v>todayIso())return;state.clearDate=v;if(state.clearState==='confirm'){clearDay(v);state.clearedDate=v;state.clearState='done'}else state.clearState='confirm'}
   else if(a==='resetall'){if(state.resetState==='working')return;if(state.resetState==='confirm'){startOver();return}state.resetState='confirm'}
@@ -699,6 +710,7 @@ window.addEventListener('online',()=>{if(user)sync()});
 render();
 
 document.addEventListener('submit',async e=>{
+  if(e.target.id==='ren-form'){e.preventDefault();const k=e.target.dataset.k,sec=e.target.dataset.sec,v=document.getElementById('ren-in').value.trim().toLowerCase();if(v){const c=cfg();const ci=c.custom[sec].findIndex(x=>x.k===k);if(ci>=0)c.custom[sec][ci].label=v;else{c.labels=c.labels||{};c.labels[k]=v}state.cfg=c;saveCfg()}state.renKey=null;render();return}
   if(e.target.id&&e.target.id.startsWith('add-')){e.preventDefault();const sec=e.target.dataset.sec,inp=e.target.querySelector('input'),v=inp.value.trim().toLowerCase();if(!v)return;const c=cfg();c.custom[sec].push({k:'c_'+Date.now().toString(36),label:v});state.cfg=c;saveCfg();render();setTimeout(()=>{const i=document.getElementById('new-'+sec);if(i)i.focus()},0);return}
   if(e.target.id!=='login')return;e.preventDefault();
   const email=document.getElementById('login-email').value.trim(),pw=document.getElementById('login-pw').value;
