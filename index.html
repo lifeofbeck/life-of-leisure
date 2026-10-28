@@ -256,12 +256,12 @@ html.boho .pill-in:focus{border-color:var(--turq)}
 .more{display:block;margin:12px auto 0;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
 html.boho .more{color:var(--turq)}
 .cday{gap:1px}
-.hm{height:6px;display:flex;justify-content:center}
-.hm i{display:block;width:6px;height:6px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--turq,#3E9E96)}
-.hm i.hp{background:#8B6BB8}
+.hm{height:9px;display:flex;justify-content:center}
+.hm i{display:block;width:9px;height:9px;background:var(--turq,#3E9E96);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
+.hm i.hp{background:#E8417F}
 .hkey{display:flex;justify-content:center;gap:16px;margin-top:8px;font-size:12px;color:var(--muted)}
-.hkey i{display:inline-block;width:6px;height:6px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--turq,#3E9E96);margin-right:6px;vertical-align:1px}
-.hkey i.hp{background:#8B6BB8}
+.hkey i{display:inline-block;width:9px;height:9px;background:var(--turq,#3E9E96);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);margin-right:6px;vertical-align:0}
+.hkey i.hp{background:#E8417F}
 .row.ren{gap:10px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -367,7 +367,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-10-25-1';
+const APP_VERSION='2026-10-28-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
