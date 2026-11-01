@@ -279,6 +279,8 @@ html.boho .rt-day.now{color:var(--turq)}
 .dot.f-clean{background:var(--turq,#3E9E96);border-color:var(--turq,#3E9E96)}
 .dot.f-balanced{background:#C9A27E;border-color:#C9A27E}
 .dot.f-better{background:#E8417F;border-color:#E8417F}
+.ms-big{font-family:var(--serif);font-size:26px;margin-top:10px;color:#F7EFE6}
+.ms-row{font-size:14px;margin-top:6px;color:#CDB8A6}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -383,7 +385,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-01-6';
+const APP_VERSION='2026-11-01-7';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -622,8 +624,10 @@ function renderHistory(){
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
   if(weeks.length)h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">past weeks</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk);
     return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span></div><div class="sc-row">workouts '+s.fit+' · clean '+s.diet+' · hobbies '+s.hobby+' · spiritual '+s.spirit+'</div></button>'}).join('')+'</section>';
-  {const q=QUOTES_DAY[(Math.floor((parse(t)-new Date(parse(t).getFullYear(),0,0))/864e5))%QUOTES_DAY.length];
-   h+='<section class="about-box qbox"><div class="caps">today’s quote</div><p class="aristotle">'+q[0]+(q[1]?'<br><span class="who">'+q[1]+'</span>':'')+'</p></section>';}
+  {const ym=state.month,[yy,mm]=ym.split('-').map(Number),ds=Object.keys(state.days).filter(k=>k.slice(0,7)===ym&&k<=t&&k>=startDate());
+   const logged=ds.filter(k=>{const x=day(k);return Object.keys(x.checks||{}).length||(x.workouts||[]).length||x.food||(x.foodNote||'').trim()||hobbiesOf(x).length}).length;
+   const wo=ds.filter(k=>(day(k).workouts||[]).length).length,cl=ds.filter(k=>day(k).food==='clean').length,hb=ds.filter(k=>hobbiesOf(day(k)).length).length;
+   h+='<section class="about-box qbox"><div class="caps">'+MONTHS[mm-1].toLowerCase()+(ym===t.slice(0,7)?' so far':'')+'</div><div class="ms-big">'+logged+' day'+(logged===1?'':'s')+' logged</div><div class="ms-row">'+wo+' workout'+(wo===1?'':'s')+' · '+cl+' clean day'+(cl===1?'':'s')+' · '+hb+' hobby day'+(hb===1?'':'s')+'</div></section>';}
   return h;
 }
 function monthNav(key,title,sub){const cur=state[key],t=todayIso(),[y,m]=cur.split('-').map(Number);
