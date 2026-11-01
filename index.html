@@ -276,6 +276,9 @@ html.boho .rt-day.now{color:var(--turq)}
 .meals{display:flex;flex-direction:column;gap:14px;padding-top:4px}
 .meal{display:flex;flex-direction:column;gap:4px}
 .meal-in{min-height:0;resize:none;overflow:hidden;padding:4px 0 6px}
+.dot.f-clean{background:var(--turq,#3E9E96);border-color:var(--turq,#3E9E96)}
+.dot.f-balanced{background:#C9A27E;border-color:#C9A27E}
+.dot.f-better{background:#E8417F;border-color:#E8417F}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -380,7 +383,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-01-2';
+const APP_VERSION='2026-11-01-3';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -598,7 +601,9 @@ function renderWeekHabit(){
   const range=nice(mon).split(', ')[1].toLowerCase()+' – '+nice(add(mon,6)).split(', ')[1].toLowerCase();
   let h='<div class="weeknav"><button class="navbtn" data-act="week" data-d="-7" aria-label="previous week">‹</button><div class="caps" style="color:var(--ink)">week of '+range+'</div><button class="navbtn" data-act="week" data-d="7" aria-label="next week"'+(add(mon,7)>t?' disabled':'')+'>›</button></div>';
   const hdr='<div class="rt rt-hd"><span class="rt-l"></span><span class="rt-dots">'+s.days.map(d=>'<span class="rt-day'+(d===t?' now':'')+'">'+DOW[parse(d).getDay()].charAt(0).toLowerCase()+'</span>').join('')+'</span><span class="rt-n"></span></div>';
-  const row=r=>'<div class="rt"><span class="rt-l">'+r.k+'</span><span class="rt-dots">'+s.days.map(d=>cell(r.fn(d),d>t)).join('')+'</span><span class="rt-n">'+r.v+'</span></div>'+(r.det?'<div class="rt-det">'+r.det+'</div>':'');
+  const fcell=(d,fut)=>{const f=day(d).food;return '<span class="dot'+(f?' f-'+f:'')+(fut?' fut':'')+'"></span>'};
+  const row=r=>'<div class="rt"><span class="rt-l">'+r.k+'</span><span class="rt-dots">'+s.days.map(d=>r.k==='clean eating'?fcell(d,d>t):cell(r.fn(d),d>t)).join('')+'</span><span class="rt-n">'+r.v+'</span></div>'+(r.det?'<div class="rt-det">'+r.det+'</div>':'');
+  R[0].det='';R[1].det='';
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">showing up</div><div class="caps sec-s">days you did each one</div></div></div>'+hdr+R.slice(0,4).map(row).join('')+'</section>';
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">routines</div><div class="caps sec-s">% of habits checked</div></div></div>'+hdr+R.slice(4).map(row).join('')+'</section>';
   const st=streakItems().map(([k,fn])=>{const[c,b]=streakOf(fn);return{k,c,b}}).filter(x=>x.b>0).sort((a,b)=>b.c-a.c||b.b-a.b);
