@@ -383,7 +383,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-01-3';
+const APP_VERSION='2026-11-01-4';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -618,7 +618,7 @@ function renderHistory(){
   for(let i=1;i<=dim;i++){const d=y+'-'+pad(m)+'-'+pad(i),fut=d>t,n=dayCount(d);
     cells+='<button class="cday'+(fut?' future':'')+(d===t?' today':'')+(posted(d)?' posted':(!fut&&n>0?' some':''))+'" data-act="open" data-date="'+d+'"'+(fut?' disabled':'')+' aria-label="'+nice(d)+', '+n+' of '+dailyTotal()+'"><span class="n">'+i+'</span><span class="hm">'+((day(d).hair||{}).wash?'<i class="hw'+((day(d).hair||{}).purple?' hp':'')+'"></i>':'')+'</span></button>'}
   let h='<section class="sec"><div class="sec-h" style="align-items:center"><button class="navbtn" data-act="month" data-d="-1" aria-label="previous month">‹</button><div style="text-align:center"><div class="sec-t">'+MONTHS[m-1].toLowerCase()+'</div><div class="caps sec-s">'+y+'</div></div><button class="navbtn" data-act="month" data-d="1" aria-label="next month"'+(state.month>=t.slice(0,7)?' disabled':'')+'>›</button></div><div class="cal">'+cells+'</div>'+(Object.keys(state.days).some(k=>k.slice(0,7)===state.month&&state.days[k].hair&&state.days[k].hair.wash)?'<div class="hkey"><span><i></i>wash day</span><span><i class="hp"></i>purple shampoo</span></div>':'')+'</section>';
-  const weeks=[];let w=mondayOf(t);const stop=mondayOf(startDate());
+  const weeks=[];let w=mondayOf(t);const stop=startDate();
   while(w>=stop&&weeks.length<60){weeks.push(w);w=add(w,-7)}
   if(weeks.length)h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">past weeks</div></div></div>'+weeks.map(wk=>{const s=weekStats(wk);
     return '<button class="sc" data-act="openweek" data-w="'+wk+'"><div style="display:flex;justify-content:space-between;width:100%"><span class="lbl" style="font-style:italic">week of '+nice(wk).split(', ')[1].toLowerCase()+'</span></div><div class="sc-row">workouts '+s.fit+' · clean '+s.diet+' · hobbies '+s.hobby+' · spiritual '+s.spirit+'</div></button>'}).join('')+'</section>';
@@ -685,7 +685,7 @@ function renderSettings(){
   {const wdAll=Object.keys(state.days).filter(d=>state.days[d]&&state.days[d].weight!=null).sort().reverse(),wn=state.wN||10,wd=wdAll.slice(0,wn);
    h+='<section class="sec"><div class="sec-h"><div class="sec-t">weigh-ins</div><div class="caps">'+wdAll.length+' logged</div></div>'+(wd.length?wd.map(d=>{const cf=state.delW===d;return '<div class="row"><span class="caps" style="width:104px;white-space:nowrap">'+nice(d).split(', ')[0]+' '+(+d.slice(8))+' '+MONTHS[+d.slice(5,7)-1].slice(0,3).toLowerCase()+'</span><span class="lbl" style="flex:1">'+esc(state.days[d].weight)+'</span><button class="mini'+(cf?' del-on':'')+'" data-act="delweight" data-date="'+d+'">'+(cf?'tap to delete':'delete')+'</button></div>'}).join(''):'<div class="sub" style="padding-top:12px">no weigh-ins yet.</div>')+(wdAll.length>wn?'<button class="more" data-act="wolder">show older</button>':'')+'</section>';}
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">clear a day</div><div class="caps sec-s">weigh-ins and cycle always stay</div></div></div><div class="group"><div class="addrow"><input type="date" id="clear-date" class="pill-in" max="'+t+'" value="'+cd+'" aria-label="day to clear"><button class="chip'+(cs==='confirm'?' on danger':'')+'" data-act="clearday">'+(cs==='confirm'?'tap again to clear':'clear')+'</button></div>'+(cs==='done'?'<div class="sub">'+nice(state.clearedDate).toLowerCase()+' is cleared.</div>':'')+'</div></section>';
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">start over</div><div class="caps sec-s">clears every day and week · weigh-ins stay</div></div></div><div class="group"><div><button class="chip'+(rs==='confirm'?' on danger':'')+'" data-act="resetall">'+(rs==='confirm'?'tap again to start over':rs==='working'?'clearing…':'start over')+'</button></div>'+(rs==='done'?'<div class="sub">a clean page. starting today.</div>':rs==='error'?'<div class="sub">that didn’t go through. check your connection and try again.</div>':'')+'</div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">start over</div><div class="caps sec-s">clears everything before today · weigh-ins and hair stay</div></div></div><div class="group"><div><button class="chip'+(rs==='confirm'?' on danger':'')+'" data-act="resetall">'+(rs==='confirm'?'tap again to start over':rs==='working'?'clearing…':'start over')+'</button></div>'+(rs==='done'?'<div class="sub">a clean page. starting today.</div>':rs==='error'?'<div class="sub">that didn’t go through. check your connection and try again.</div>':'')+'</div></section>';
   h+='<section class="sec"><div class="sec-h"><div class="sec-t">account</div></div><div class="group"><div><button class="chip" data-act="signout">sign out</button></div></div></section>';
   return h;
 }
@@ -693,7 +693,7 @@ function keepOnly(d){const x=state.days[d]||{},k={date:d};if(x.weight!=null)k.we
 function clearDay(d){clearTimeout(timers['days'+d]);state.days[d]=keepOnly(d);lsSet('lol.days',state.days);queueSave('days',d,state.days[d],pendingDays)}
 async function startOver(){
   state.resetState='working';render();
-  Object.keys(state.days).forEach(d=>{clearTimeout(timers['days'+d]);state.days[d]=keepOnly(d);dirty.days[d]=1});
+  const td=todayIso();Object.keys(state.days).filter(d=>d<td).forEach(d=>{clearTimeout(timers['days'+d]);state.days[d]=keepOnly(d);dirty.days[d]=1});
   lsSet('lol.days',state.days);lsSet('lol.dirty',dirty);
   Object.keys(state.weeks).forEach(k=>{delete dirty.weeks[k]});state.weeks={};lsSet('lol.weeks',{});
   const c=cfg();c.start=todayIso();state.cfg=c;saveCfg();
