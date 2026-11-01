@@ -273,6 +273,9 @@ html.boho .rt-day.now{color:var(--turq)}
 .rt-det{font-size:13px;color:var(--muted);padding:6px 0 10px;border-bottom:1px solid var(--line);margin-top:-1px}
 .sk-c{font-size:15px;color:var(--ink);margin-right:12px}
 .sk-b{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);width:64px;text-align:right}
+.meals{display:flex;flex-direction:column;gap:14px;padding-top:4px}
+.meal{display:flex;flex-direction:column;gap:4px}
+.meal-in{min-height:0;resize:none;overflow:hidden;padding:4px 0 6px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -377,7 +380,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-01-1';
+const APP_VERSION='2026-11-01-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -604,8 +607,8 @@ function renderWeekHabit(){
 }
 function renderWeek(){return renderWeekHabit()}
 function renderHistory(){
-  const[y,m]=state.month.split('-').map(Number),first=new Date(y,m-1,1),t=todayIso(),lead=(first.getDay()+6)%7,dim=new Date(y,m,0).getDate();
-  let cells=['M','T','W','T','F','S','S'].map(x=>'<div class="dow">'+x+'</div>').join('');
+  const[y,m]=state.month.split('-').map(Number),first=new Date(y,m-1,1),t=todayIso(),lead=first.getDay(),dim=new Date(y,m,0).getDate();
+  let cells=['S','M','T','W','T','F','S'].map(x=>'<div class="dow">'+x+'</div>').join('');
   for(let i=0;i<lead;i++)cells+='<div></div>';
   for(let i=1;i<=dim;i++){const d=y+'-'+pad(m)+'-'+pad(i),fut=d>t,n=dayCount(d);
     cells+='<button class="cday'+(fut?' future':'')+(d===t?' today':'')+(posted(d)?' posted':(!fut&&n>0?' some':''))+'" data-act="open" data-date="'+d+'"'+(fut?' disabled':'')+' aria-label="'+nice(d)+', '+n+' of '+dailyTotal()+'"><span class="n">'+i+'</span><span class="hm">'+((day(d).hair||{}).wash?'<i class="hw'+((day(d).hair||{}).purple?' hp':'')+'"></i>':'')+'</span></button>'}
@@ -621,10 +624,15 @@ function renderHistory(){
 function monthNav(key,title,sub){const cur=state[key],t=todayIso(),[y,m]=cur.split('-').map(Number);
   return '<div class="sec-h" style="align-items:center"><button class="navbtn" data-act="month" data-k="'+key+'" data-d="-1" aria-label="previous month">‹</button><div style="text-align:center">'+(title?'<div class="sec-t">'+title+'</div>':'')+'<div class="caps'+(title?' sec-s':'')+'">'+MONTHS[m-1].toLowerCase()+' '+y+(sub?' · '+sub:'')+'</div></div><button class="navbtn" data-act="month" data-k="'+key+'" data-d="1" aria-label="next month"'+(cur>=t.slice(0,7)?' disabled':'')+'>›</button></div>';}
 function monthDays(ym){const[y,m]=ym.split('-').map(Number),dim=new Date(y,m,0).getDate(),r=[];for(let i=1;i<=dim;i++)r.push(y+'-'+pad(m)+'-'+pad(i));return r}
+const MEALS=[['breakfast','breakfast'],['lunch','lunch'],['dinner','dinner'],['snacks','snacks & drinks']];
+function mealBoxes(x){const m=x.meals||{},legacy=!x.meals&&x.foodNote?x.foodNote:'';
+  return '<div class="meals">'+MEALS.map(q=>'<label class="meal"><span class="caps">'+q[1]+'</span><textarea class="note meal-in" data-meal="'+q[0]+'" rows="1" aria-label="'+q[1]+'">'+esc(m[q[0]]||'')+'</textarea></label>').join('')+(legacy?'<label class="meal"><span class="caps">notes</span><textarea class="note meal-in" data-meal="notes" rows="2" aria-label="notes">'+esc(legacy)+'</textarea></label>':(m.notes?'<label class="meal"><span class="caps">notes</span><textarea class="note meal-in" data-meal="notes" rows="2" aria-label="notes">'+esc(m.notes)+'</textarea></label>':''))+'</div>';}
+function mealsToNote(m){return MEALS.concat([['notes','notes']]).filter(q=>(m[q[0]]||'').trim()).map(q=>q[1]+': '+m[q[0]].trim()).join('\n')}
+function grow(el){el.style.height='auto';el.style.height=el.scrollHeight+'px'}
 function renderFood(){
   const d=state.date,x=day(d),mon=mondayOf(d),ws=weekStats(mon);
   let h=dayBar(d);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">food</div><div class="caps sec-s">what you ate</div></div><div class="caps">'+ws.diet+' clean this week</div></div><div class="group"><div class="chips">'+FOOD.map(f=>chip('food',f[0],f[1],x.food===f[0])).join('')+'</div><textarea id="food-note" class="note" rows="4" aria-label="what i ate today" placeholder="">'+esc(x.foodNote||'')+'</textarea>'+aiLine(d)+'</div></section>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">food</div><div class="caps sec-s">what you ate</div></div><div class="caps">'+ws.diet+' clean this week</div></div><div class="group"><div class="chips">'+FOOD.map(f=>chip('food',f[0],f[1],x.food===f[0])).join('')+'</div>'+mealBoxes(x)+aiLine(d)+'</div></section>';
   const wk=ws.days.filter(k=>k<=todayIso()&&(day(k).food||day(k).foodNote)).reverse();
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">this week</div><div class="caps sec-s">clean '+ws.diet+' · balanced '+ws.bal+' · could be better '+ws.bet+'</div></div></div>';
   h+=wk.length?'<div class="diary-list" style="border-top:0;margin-top:4px;padding-top:4px">'+wk.map(k=>{const y=day(k),f=FOOD_BY[y.food];return '<button class="diary" style="text-align:left;width:100%" data-act="open" data-to="food" data-date="'+k+'"><span class="caps">'+DOW[parse(k).getDay()]+'</span>'+(f?'<span class="fpill">'+f[1].toLowerCase()+'</span>':'<span class="sub">not rated</span>')+(y.foodNote?'<span class="dnote">'+esc(y.foodNote)+'</span>':'')+(state.ai[k]&&FOOD_BY[state.ai[k].rating]?'<span class="dnote ai-mini">claude: '+esc(FOOD_BY[state.ai[k].rating][1].toLowerCase())+'. '+esc(state.ai[k].why)+'</span>':'')+'</button>'}).join('')+'</div>':'<div class="sub" style="padding-top:12px">nothing logged this week yet.</div>';
@@ -698,6 +706,7 @@ function render(){
   tabsEl.hidden=false;
   const body=state.tab==='settings'?renderSettings():state.tab==='week'?renderWeek():state.tab==='history'?renderHistory():state.tab==='food'?renderFood():state.tab==='body'?renderBody():renderToday();
   app.innerHTML=header()+body+'<div class="foot"><span id="sync">'+syncText()+'</span></div>';
+  document.querySelectorAll('.meal-in').forEach(grow);
   document.getElementById('tabs').innerHTML=[['today','today'],['food','food'],['body','body'],['week','week'],['history','history']].map(t=>'<button class="'+(state.tab===t[0]?'on':'')+'" data-act="tab" data-t="'+t[0]+'" aria-current="'+(state.tab===t[0]?'page':'false')+'"><span class="it">'+t[1]+'</span></button>').join('');
 }
 
@@ -735,9 +744,9 @@ document.addEventListener('click',e=>{
 });
 
 let deferred=false;
-function safeRender(){const ae=document.activeElement;if(ae&&(ae.id==='food-note'||ae.id==='weight')){deferred=true;return}render()}
-document.addEventListener('input',e=>{if(e.target.id==='clear-date'){state.clearDate=e.target.value;if(state.clearState){state.clearState=null;render()}return}if(e.target.id==='weight'){const v=e.target.value.replace(/[^0-9.]/g,'');const n=parseFloat(v);setDay(state.date,x=>{if(v&&!isNaN(n))x.weight=Math.round(n*10)/10;else delete x.weight});return}if(e.target.id==='food-note'){const v=e.target.value;setDay(state.date,x=>{x.foodNote=v})}});
-document.addEventListener('focusout',e=>{if((e.target.id==='food-note'||e.target.id==='weight')&&deferred){deferred=false;setTimeout(render,0)}});
+function safeRender(){const ae=document.activeElement;if(ae&&(ae.id==='food-note'||ae.id==='weight'||ae.classList.contains('meal-in'))){deferred=true;return}render()}
+document.addEventListener('input',e=>{if(e.target.id==='clear-date'){state.clearDate=e.target.value;if(state.clearState){state.clearState=null;render()}return}if(e.target.id==='weight'){const v=e.target.value.replace(/[^0-9.]/g,'');const n=parseFloat(v);setDay(state.date,x=>{if(v&&!isNaN(n))x.weight=Math.round(n*10)/10;else delete x.weight});return}if(e.target.classList&&e.target.classList.contains('meal-in')){grow(e.target);const k=e.target.dataset.meal,v=e.target.value;setDay(state.date,x=>{const m=Object.assign({},x.meals||{});if(!x.meals&&x.foodNote&&k!=='notes')m.notes=x.foodNote;m[k]=v;Object.keys(m).forEach(z=>{if(!m[z])delete m[z]});x.meals=m;x.foodNote=mealsToNote(m)});return}if(e.target.id==='food-note'){const v=e.target.value;setDay(state.date,x=>{x.foodNote=v})}});
+document.addEventListener('focusout',e=>{if((e.target.id==='food-note'||e.target.id==='weight'||(e.target.classList&&e.target.classList.contains('meal-in')))&&deferred){deferred=false;setTimeout(render,0)}});
 let lastDay=todayIso();
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;if(todayIso()!==lastDay){if(state.date===lastDay)state.date=todayIso();lastDay=todayIso();render()}checkForUpdate();if(user)sync()});
 window.addEventListener('online',()=>{if(user)sync()});
