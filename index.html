@@ -383,7 +383,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-01-5';
+const APP_VERSION='2026-11-01-6';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -629,7 +629,7 @@ function renderHistory(){
 function monthNav(key,title,sub){const cur=state[key],t=todayIso(),[y,m]=cur.split('-').map(Number);
   return '<div class="sec-h" style="align-items:center"><button class="navbtn" data-act="month" data-k="'+key+'" data-d="-1" aria-label="previous month">‹</button><div style="text-align:center">'+(title?'<div class="sec-t">'+title+'</div>':'')+'<div class="caps'+(title?' sec-s':'')+'">'+MONTHS[m-1].toLowerCase()+' '+y+(sub?' · '+sub:'')+'</div></div><button class="navbtn" data-act="month" data-k="'+key+'" data-d="1" aria-label="next month"'+(cur>=t.slice(0,7)?' disabled':'')+'>›</button></div>';}
 function monthDays(ym){const[y,m]=ym.split('-').map(Number),dim=new Date(y,m,0).getDate(),r=[];for(let i=1;i<=dim;i++)r.push(y+'-'+pad(m)+'-'+pad(i));return r}
-const MEALS=[['breakfast','breakfast'],['lunch','lunch'],['dinner','dinner'],['snacks','snacks & drinks']];
+const MEALS=[['breakfast','breakfast'],['lunch','lunch'],['dinner','dinner'],['snacks','snacks']];
 function mealBoxes(x){const m=x.meals||{},legacy=!x.meals&&x.foodNote?x.foodNote:'';
   return '<div class="meals">'+MEALS.map(q=>'<label class="meal"><span class="caps">'+q[1]+'</span><textarea class="note meal-in" data-meal="'+q[0]+'" rows="1" aria-label="'+q[1]+'">'+esc(m[q[0]]||'')+'</textarea></label>').join('')+(legacy?'<label class="meal"><span class="caps">notes</span><textarea class="note meal-in" data-meal="notes" rows="2" aria-label="notes">'+esc(legacy)+'</textarea></label>':(m.notes?'<label class="meal"><span class="caps">notes</span><textarea class="note meal-in" data-meal="notes" rows="2" aria-label="notes">'+esc(m.notes)+'</textarea></label>':''))+'</div>';}
 function mealsToNote(m){return MEALS.concat([['notes','notes']]).filter(q=>(m[q[0]]||'').trim()).map(q=>q[1]+': '+m[q[0]].trim()).join('\n')}
