@@ -281,6 +281,7 @@ html.boho .rt-day.now{color:var(--turq)}
 .dot.f-better{background:#E8417F;border-color:#E8417F}
 .ms-big{font-family:var(--serif);font-size:26px;margin-top:10px;color:#F7EFE6}
 .ms-row{font-size:14px;margin-top:6px;color:#CDB8A6}
+.ai-c{display:block;font-size:13px;color:#CDB8A6;margin-top:4px;font-style:normal}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -385,7 +386,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-01-7';
+const APP_VERSION='2026-11-08-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -427,7 +428,7 @@ async function pull(){
   try{
     const [d,w]=await Promise.all([fetchAll('days','date,data'),fetchAll('weeks','monday,data')]);
     try{if(!cfgDirty){const {data:st,error:se}=await sb.from('settings').select('data').maybeSingle();if(!se&&st){state.cfg=st.data||{};lsSet('lol.cfg',state.cfg)}}}catch(e){console.warn(e)}
-    try{const a=await fetchAll('food_ai','date,rating,why');state.ai={};a.forEach(r=>{if(r.date>=APP_START)state.ai[r.date]={rating:r.rating,why:r.why}});lsSet('lol.ai',state.ai)}catch(e){console.warn(e)}
+    try{const a=await fetchAll('food_ai','date,rating,why,cals');state.ai={};a.forEach(r=>{if(r.date>=APP_START)state.ai[r.date]={rating:r.rating,why:r.why,cals:r.cals}});lsSet('lol.ai',state.ai)}catch(e){console.warn(e)}
     {const nd={};Object.keys(state.days).forEach(k=>{if(dirty.days[k]||pendingDays.has(k))nd[k]=state.days[k]});d.forEach(r=>{if(!nd[r.date])nd[r.date]=r.data||{}});state.days=nd;}
     {const nw={};Object.keys(state.weeks).forEach(k=>{if(dirty.weeks[k]||pendingWeeks.has(k))nw[k]=state.weeks[k]});w.forEach(r=>{if(!nw[r.monday])nw[r.monday]=r.data||{}});state.weeks=nw;}
     lsSet('lol.days',state.days);lsSet('lol.weeks',state.weeks);
@@ -487,8 +488,9 @@ function section(title,en,sec,date){
 function chip(act,key,label,on){return '<button class="chip'+(on?' on':'')+'" data-act="'+act+'" data-k="'+key+'" aria-pressed="'+on+'">'+esc(label)+'</button>'}
 function aiLine(d){
   const a=(day(d).foodNote||'').trim()?state.ai[d]:null;
-  if(!a||!FOOD_BY[a.rating])return '<div class="ai empty"><span class="ai-w">updates at 8:30</span></div>';
-  return '<div class="ai"><span class="ai-r">'+esc(FOOD_BY[a.rating][1].toLowerCase())+'</span><span class="ai-w">'+esc(a.why)+'</span></div>';
+  if(!a||!FOOD_BY[a.rating])return '<div class="ai empty"><span class="ai-w">'+((day(d).foodNote||'').trim()?'claude is reading your meals · updates hourly':'log a meal and claude will rate it')+'</span></div>';
+  const c=a.cals||{},fmt=n=>Math.round(+n).toLocaleString(),mm=MEALS.concat([['notes','other']]).filter(q=>c[q[0]]).map(q=>q[1]+' ~'+fmt(c[q[0]]));
+  return '<div class="ai"><span class="ai-r">'+esc(FOOD_BY[a.rating][1].toLowerCase())+(c.total?' · ~'+fmt(c.total)+' cal so far':'')+'</span>'+(mm.length?'<span class="ai-c">'+esc(mm.join(' · '))+'</span>':'')+'<span class="ai-w">'+esc(a.why)+'</span></div>';
 }
 function postmark(date){
   const d=parse(date),t=(MON[d.getMonth()]+' '+d.getDate()).toLowerCase();
