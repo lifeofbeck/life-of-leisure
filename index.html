@@ -386,7 +386,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-08-1';
+const APP_VERSION='2026-11-09-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -610,8 +610,6 @@ function renderWeekHabit(){
   R[0].det='';R[1].det='';
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">showing up</div><div class="caps sec-s">days you did each one</div></div></div>'+hdr+R.slice(0,4).map(row).join('')+'</section>';
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">routines</div><div class="caps sec-s">% of habits checked</div></div></div>'+hdr+R.slice(4).map(row).join('')+'</section>';
-  const st=streakItems().map(([k,fn])=>{const[c,b]=streakOf(fn);return{k,c,b}}).filter(x=>x.b>0).sort((a,b)=>b.c-a.c||b.b-a.b);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">streaks</div><div class="caps sec-s">days in a row</div></div></div>'+(st.length?st.map(x=>'<div class="rt"><span class="lbl" style="flex:1">'+esc(x.k)+'</span><span class="sk-c">'+(x.c?x.c+(x.c===1?' day':' days'):'')+'</span><span class="sk-b">best '+x.b+'</span></div>').join(''):'<div class="sub" style="padding-top:12px">your streaks will show up here as you log.</div>')+'</section>';
   return h;
 }
 function renderWeek(){return renderWeekHabit()}
