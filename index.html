@@ -389,7 +389,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-11-2';
+const APP_VERSION='2026-11-11-3';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -689,12 +689,10 @@ function skSync(x,p,date){const st=skSteps(p,date),dn=((x.skin||{})[p])||[],key=
 function skRow(p,q,date){const on=skDone(p,date).includes(q.id);return '<button class="row'+(on?' on':'')+'" data-act="skstep" data-p="'+p+'" data-k="'+esc(q.id)+'" aria-pressed="'+on+'"><span class="mark">'+CHECK+'</span><span class="lbl">'+esc(q.n)+'</span></button>'}
 function skinSection(date){
   const am=skSteps('am',date),pm=skSteps('pm',date),da=skDone('am',date),dp=skDone('pm',date),k=skin();
-  const sa=streakOf(x=>!!dayChecks(x).skinam)[0],sp=streakOf(x=>!!dayChecks(x).skinpm)[0];
   let h='<section class="sec"><div class="sec-h"><div><div class="sec-t">skincare routine</div><div class="caps sec-s">'+FULLDOW[parse(date).getDay()].toLowerCase()+'</div></div></div>';
   h+='<div class="group-h sk-h"><span class="lbl">morning</span><span class="sub">'+am.filter(q=>da.includes(q.id)).length+' / '+am.length+'</span></div>'+am.map(q=>skRow('am',q,date)).join('');
   h+='<div class="group-h sk-h"><span class="lbl">tonight</span><span class="sub">'+pm.filter(q=>dp.includes(q.id)).length+' / '+pm.length+'</span></div>'+(pm.length?pm.map(q=>skRow('pm',q,date)).join(''):'<div class="sub" style="padding:10px 0">nothing scheduled tonight.</div>');
   if(k.note)h+='<div class="sk-note">'+esc(k.note)+'</div>';
-  if(sa||sp)h+='<div class="sk-streak">'+[sa?'am '+sa+(sa===1?' day':' days')+' in a row':'',sp?'pm '+sp+(sp===1?' day':' days')+' in a row':''].filter(Boolean).join(' · ')+'</div>';
   return h+'</section>';
 }
 function manageSkin(){
