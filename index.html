@@ -282,6 +282,9 @@ html.boho .rt-day.now{color:var(--turq)}
 .ms-big{font-family:var(--serif);font-size:26px;margin-top:10px;color:#F7EFE6}
 .ms-row{font-size:14px;margin-top:6px;color:#CDB8A6}
 .ai-c{display:block;font-size:13px;color:#CDB8A6;margin-top:4px;font-style:normal}
+.sk-h{padding-top:16px}
+.sk-note{font-size:13px;color:var(--muted);font-style:italic;padding:14px 0 2px;line-height:1.45}
+.sk-streak{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--turq,#3E9E96);padding-top:10px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -298,8 +301,8 @@ const APP_START='2026-10-12';
 const COLORS={morning:'#E8742C',night:'#3B5B9A',spirit:'#1F8A8A',fitness:'#C8322F',diet:'#D9A520',hobby:'#D9486F'};
 const TEXT={morning:'#9A4613',night:'#2C4577',spirit:'#155F5F',fitness:'#9E2522',diet:'#7F5F0D',hobby:'#A5304F'};
 const MOTIF={morning:'sun',night:'moon',spirit:'olive',fitness:'star',diet:'lemon',hobby:'heart'};
-const MORNING=[['hair','Hair'],['makeup','Makeup'],['prayer','Prayer'],['scripture','Daily scripture'],['guasha','Gua sha'],['gut','clean slate']];
-const NIGHT=[['digestivo','Cherry digestivo'],['shower','Shower'],['lotion','Body lotion'],['lash','Lash serum'],['retainers','Retainers']];
+const MORNING=[['hair','Hair'],['makeup','Makeup'],['prayer','Prayer'],['scripture','Daily scripture'],['guasha','Gua sha'],['gut','clean slate'],['skinam','am skincare']];
+const NIGHT=[['digestivo','Cherry digestivo'],['shower','Shower'],['lotion','Body lotion'],['lash','Lash serum'],['retainers','Retainers'],['skinpm','pm skincare']];
 const SPIRIT=['Meeting','Family worship','Personal study','Study for the meeting','Meeting','Study the Watchtower','Service'];
 const WORKOUTS=[['pilates','Pilates'],['sculpt','Sculpt'],['steps','10k steps']];
 const FOOD=[['clean','Clean','#D9A520','#7F5F0D'],['balanced','Balanced','#E8742C','#9A4613'],['better','Could be better','#8A6A4A','#5E4630']];
@@ -386,7 +389,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-09-1';
+const APP_VERSION='2026-11-11-1';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -457,7 +460,7 @@ function setSync(s){state.sync=s;const el=document.getElementById('sync');if(el)
 function syncText(){return{local:'saving on this device',loading:'syncing…',saved:'saved ✦ synced',offline:'offline ✦ saved on your phone, will sync when you’re back online',error:'couldn’t sync just now. it will try again when you reopen the app.'}[state.sync]||''}
 
 /* ---------- habits (built-in + your own) ---------- */
-function cfg(){const c=state.cfg||{};c.custom=c.custom||{};c.custom.morning=c.custom.morning||[];c.custom.night=c.custom.night||[];c.hidden=c.hidden||[];c.custom.hobbies=c.custom.hobbies||[];return c}
+function cfg(){if(!state.cfg)state.cfg={};const c=state.cfg;c.custom=c.custom||{};c.custom.morning=c.custom.morning||[];c.custom.night=c.custom.night||[];c.hidden=c.hidden||[];c.custom.hobbies=c.custom.hobbies||[];return c}
 function allOf(sec){const c=cfg(),del=c.deleted||[],lb=c.labels||{},base=sec==='hobbies'?[...HOBBY_MAIN,...HOBBY_FUN]:sec==='morning'?MORNING:NIGHT;return base.filter(h=>!del.includes(h[0])).map(h=>[h[0],lb[h[0]]||h[1]]).concat(c.custom[sec].map(x=>[x.k,x.label]))}
 function hobbyList(){const c=cfg();return allOf('hobbies').filter(h=>!c.hidden.includes(h[0]))}
 function hobbyName(k){const lb=cfg().labels||{};if(lb[k])return lb[k];const f=[...HOBBY_MAIN,...HOBBY_FUN].find(h=>h[0]===k)||cfg().custom.hobbies.map(x=>[x.k,x.label]).find(h=>h[0]===k);return f?f[1]:k}
@@ -512,6 +515,7 @@ function renderToday(){
   h+=section('morning','habits','morning',d);
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">spiritual</div><div class="caps sec-s">'+FULLDOW[parse(d).getDay()].toLowerCase()+'</div></div><div class="caps">'+(dayChecks(d).spirit?'1':'0')+' / 1</div></div>'+habitRow('spirit',SPIRIT[parse(d).getDay()],d)+'</section>';
   h+=section('night','habits','night',d);
+  h+=skinSection(d);
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">also today</div><div class="caps sec-s">this week so far</div></div></div>';
   h+='<div class="group"><div class="group-h"><span class="lbl">workouts</span><span class="sub">'+ws.fit+' this week</span></div><div class="chips">'+WORKOUTS.map(o=>chip('workout',o[0],o[1],w.includes(o[0]))).join('')+'</div></div>';
   {const HL=hobbyList();
@@ -609,6 +613,8 @@ function renderWeekHabit(){
   const row=r=>'<div class="rt"><span class="rt-l">'+r.k+'</span><span class="rt-dots">'+s.days.map(d=>r.k==='clean eating'?fcell(d,d>t):cell(r.fn(d),d>t)).join('')+'</span><span class="rt-n">'+r.v+'</span></div>'+(r.det?'<div class="rt-det">'+r.det+'</div>':'');
   R[0].det='';R[1].det='';
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">showing up</div><div class="caps sec-s">days you did each one</div></div></div>'+hdr+R.slice(0,4).map(row).join('')+'</section>';
+  {const skr=[['am skincare','skinam'],['pm skincare','skinpm']].map(([k,key])=>({k,fn:d=>dayChecks(d)[key]?1:0,v:s.days.filter(d=>dayChecks(d)[key]).length}));
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">skincare</div><div class="caps sec-s">days you did it</div></div></div>'+hdr+skr.map(row).join('')+'</section>';}
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">routines</div><div class="caps sec-s">% of habits checked</div></div></div>'+hdr+R.slice(4).map(row).join('')+'</section>';
   return h;
 }
@@ -673,6 +679,34 @@ function renderBody(){
     if(wl.length>5)h+='<button class="more" data-act="wall">'+(state.wAll===state.bmonth?'show less':'see all '+wl.length)+'</button>';}
   return h+'</section>';
 }
+const SKIN_DEFAULT={"am": [{"id": "a1", "n": "Rinse with water"}, {"id": "a2", "n": "Dr. Althea 345"}, {"id": "a3", "n": "Sunscreen"}], "pm": {"0": [{"id": "p0_1", "n": "BYOMA"}, {"id": "p0_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p0_3", "n": "Dr. Althea 345"}], "1": [{"id": "p1_1", "n": "BYOMA"}, {"id": "p1_2", "n": "PanOxyl"}, {"id": "p1_3", "n": "rhode Barrier Restore Cream"}], "2": [{"id": "p2_1", "n": "BYOMA"}, {"id": "p2_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p2_3", "n": "Dr. Althea 345"}, {"id": "p2_4", "n": "Dr. Leo"}], "3": [{"id": "p3_1", "n": "BYOMA"}, {"id": "p3_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p3_3", "n": "Dr. Althea 345"}, {"id": "p3_4", "n": "Dr. Leo"}], "4": [{"id": "p4_1", "n": "BYOMA"}, {"id": "p4_2", "n": "PanOxyl"}, {"id": "p4_3", "n": "rhode Barrier Restore Cream"}], "5": [{"id": "p5_1", "n": "BYOMA"}, {"id": "p5_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p5_3", "n": "Dr. Althea 345"}, {"id": "p5_4", "n": "Dr. Leo"}], "6": [{"id": "p6_1", "n": "BYOMA"}, {"id": "p6_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p6_3", "n": "Dr. Althea 345"}, {"id": "p6_4", "n": "Dr. Leo"}]}, "note": "Cicaplast only on spots that feel dry, tight or flaky, any day.", "arch": []};
+function skin(){const c=cfg();if(!c.skin)c.skin=JSON.parse(JSON.stringify(SKIN_DEFAULT));c.skin.arch=c.skin.arch||[];return c.skin}
+function skSteps(p,date){const k=skin();return p==='am'?k.am:(k.pm[String(parse(date).getDay())]||[])}
+function skDone(p,date){return ((day(date).skin||{})[p])||[]}
+function skSync(x,p,date){const st=skSteps(p,date),dn=((x.skin||{})[p])||[],key=p==='am'?'skinam':'skinpm';if(st.length&&st.every(q=>dn.includes(q.id)))x.checks[key]=true;else delete x.checks[key]}
+function skRow(p,q,date){const on=skDone(p,date).includes(q.id);return '<button class="row'+(on?' on':'')+'" data-act="skstep" data-p="'+p+'" data-k="'+esc(q.id)+'" aria-pressed="'+on+'"><span class="mark">'+CHECK+'</span><span class="lbl">'+esc(q.n)+'</span></button>'}
+function skinSection(date){
+  const am=skSteps('am',date),pm=skSteps('pm',date),da=skDone('am',date),dp=skDone('pm',date),k=skin();
+  const sa=streakOf(x=>!!dayChecks(x).skinam)[0],sp=streakOf(x=>!!dayChecks(x).skinpm)[0];
+  let h='<section class="sec"><div class="sec-h"><div><div class="sec-t">my skincare routine</div><div class="caps sec-s">'+FULLDOW[parse(date).getDay()].toLowerCase()+'</div></div></div>';
+  h+='<div class="group-h sk-h"><span class="lbl">morning</span><span class="sub">'+am.filter(q=>da.includes(q.id)).length+' / '+am.length+'</span></div>'+am.map(q=>skRow('am',q,date)).join('');
+  h+='<div class="group-h sk-h"><span class="lbl">tonight</span><span class="sub">'+pm.filter(q=>dp.includes(q.id)).length+' / '+pm.length+'</span></div>'+(pm.length?pm.map(q=>skRow('pm',q,date)).join(''):'<div class="sub" style="padding:10px 0">nothing scheduled tonight.</div>');
+  if(k.note)h+='<div class="sk-note">'+esc(k.note)+'</div>';
+  if(sa||sp)h+='<div class="sk-streak">'+[sa?'am '+sa+(sa===1?' day':' days')+' in a row':'',sp?'pm '+sp+(sp===1?' day':' days')+' in a row':''].filter(Boolean).join(' · ')+'</div>';
+  return h+'</section>';
+}
+function manageSkin(){
+  const k=skin(),L=state.skList||'am',items=L==='am'?k.am:(k.pm[L]||[]),tabs=[['am','morning']].concat([0,1,2,3,4,5,6].map(i=>[String(i),DOW[i].toLowerCase().slice(0,3)]));
+  let h='<section class="sec"><div class="sec-h"><div><div class="sec-t">skincare routine</div><div class="caps sec-s">'+(L==='am'?'every morning':FULLDOW[+L].toLowerCase()+' night')+'</div></div></div>';
+  h+='<div class="chips" style="padding-top:12px">'+tabs.map(t=>'<button class="chip'+(L===t[0]?' on':'')+'" data-act="sklist" data-k="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>';
+  h+=items.map((q,i)=>state.skRen===q.id?'<form class="row ren" id="skren-form" data-k="'+esc(q.id)+'"><input id="skren-in" class="pill-in" value="'+esc(q.n)+'" autocomplete="off" aria-label="new name"><button type="submit" class="chip on">save</button></form>':'<div class="row"><button class="lbl" style="flex:1;text-align:left" data-act="skren" data-k="'+esc(q.id)+'">'+esc(q.n)+'</button>'+(i?'<button class="mini" data-act="skup" data-k="'+esc(q.id)+'" aria-label="move up">↑</button>':'')+'<button class="mini" style="margin-left:12px" data-act="skren" data-k="'+esc(q.id)+'">rename</button><button class="mini" style="margin-left:12px" data-act="skarch" data-k="'+esc(q.id)+'">archive</button></div>').join('');
+  h+='<form class="addrow" id="sk-add"><input id="sk-new" class="pill-in" placeholder="add a step" autocomplete="off" aria-label="add a skincare step"><button type="submit" class="chip on">add</button></form>';
+  const arch=k.arch;
+  if(arch.length)h+='<div class="arch"><div class="caps">archived steps</div>'+arch.map(q=>{const cf=state.skDel===q.id;return '<div class="row"><span class="lbl" style="flex:1;color:var(--muted)">'+esc(q.n)+' <span class="sub">· '+(q.from==='am'?'morning':FULLDOW[+q.from].toLowerCase().slice(0,3))+'</span></span><button class="mini" style="color:var(--turq)" data-act="skrestore" data-k="'+esc(q.id)+'">restore</button><button class="mini'+(cf?' del-on':'')+'" style="margin-left:12px" data-act="skdel" data-k="'+esc(q.id)+'">'+(cf?'tap to delete':'delete')+'</button></div>'}).join('')+'</div>';
+  h+='<div class="group" style="border:0"><div class="caps" style="padding-top:14px">note</div><textarea id="sk-note" class="note" rows="2" aria-label="skincare note">'+esc(k.note||'')+'</textarea></div>';
+  return h+'</section>';
+}
+function skListRef(L){const k=skin();if(L==='am')return k.am;k.pm[L]=k.pm[L]||[];return k.pm[L]}
 function manageList(sec,title){
   const c=cfg(),all=allOf(sec),on=all.filter(h=>!c.hidden.includes(h[0])),off=all.filter(h=>c.hidden.includes(h[0]));
   const ph={morning:'stretch for 10 minutes',night:'read before bed',hobbies:'pottery'}[sec];
@@ -685,7 +719,7 @@ function manageList(sec,title){
 function renderSettings(){
   const t=todayIso(),cd=state.clearDate||t,cs=state.clearState,rs=state.resetState;
   let h='<div class="setbar"><button class="today-link" data-act="closeset">‹ back</button><div class="sec-t">settings</div><span style="width:44px"></span></div>';
-  h+=manageList('morning','morning habits')+manageList('night','night habits')+manageList('hobbies','hobbies');
+  h+=manageList('morning','morning habits')+manageList('night','night habits')+manageList('hobbies','hobbies')+manageSkin();
   {const wdAll=Object.keys(state.days).filter(d=>state.days[d]&&state.days[d].weight!=null).sort().reverse(),wn=state.wN||10,wd=wdAll.slice(0,wn);
    h+='<section class="sec"><div class="sec-h"><div class="sec-t">weigh-ins</div><div class="caps">'+wdAll.length+' logged</div></div>'+(wd.length?wd.map(d=>{const cf=state.delW===d;return '<div class="row"><span class="caps" style="width:104px;white-space:nowrap">'+nice(d).split(', ')[0]+' '+(+d.slice(8))+' '+MONTHS[+d.slice(5,7)-1].slice(0,3).toLowerCase()+'</span><span class="lbl" style="flex:1">'+esc(state.days[d].weight)+'</span><button class="mini'+(cf?' del-on':'')+'" data-act="delweight" data-date="'+d+'">'+(cf?'tap to delete':'delete')+'</button></div>'}).join(''):'<div class="sub" style="padding-top:12px">no weigh-ins yet.</div>')+(wdAll.length>wn?'<button class="more" data-act="wolder">show older</button>':'')+'</section>';}
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">clear a day</div><div class="caps sec-s">weigh-ins and cycle always stay</div></div></div><div class="group"><div class="addrow"><input type="date" id="clear-date" class="pill-in" max="'+t+'" value="'+cd+'" aria-label="day to clear"><button class="chip'+(cs==='confirm'?' on danger':'')+'" data-act="clearday">'+(cs==='confirm'?'tap again to clear':'clear')+'</button></div>'+(cs==='done'?'<div class="sub">'+nice(state.clearedDate).toLowerCase()+' is cleared.</div>':'')+'</div></section>';
@@ -722,7 +756,14 @@ function render(){
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b||b.disabled)return;
   const a=b.dataset.act,d=state.date;
-  if(a==='habit'){const k=b.dataset.k;setDay(d,x=>{x.checks[k]=!x.checks[k];if(!x.checks[k])delete x.checks[k];else state.popKey=k})}
+  if(a==='habit'){const k=b.dataset.k;setDay(d,x=>{x.checks[k]=!x.checks[k];if(!x.checks[k])delete x.checks[k];else state.popKey=k;if(k==='skinam'||k==='skinpm'){const p=k==='skinam'?'am':'pm';x.skin=Object.assign({},x.skin||{});x.skin[p]=x.checks[k]?skSteps(p,d).map(q=>q.id):[]}})}
+  else if(a==='skstep'){const p=b.dataset.p,k=b.dataset.k;setDay(d,x=>{x.skin=Object.assign({},x.skin||{});const arr=(x.skin[p]||[]).slice(),i=arr.indexOf(k);if(i>=0)arr.splice(i,1);else arr.push(k);x.skin[p]=arr;skSync(x,p,d)})}
+  else if(a==='sklist'){state.skList=b.dataset.k;state.skRen=null}
+  else if(a==='skren'){state.skRen=b.dataset.k;render();setTimeout(()=>{const i=document.getElementById('skren-in');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},0);return}
+  else if(a==='skup'){const L=skListRef(state.skList||'am'),i=L.findIndex(q=>q.id===b.dataset.k);if(i>0){const t=L[i];L[i]=L[i-1];L[i-1]=t;saveCfg()}}
+  else if(a==='skarch'){const Lk=state.skList||'am',L=skListRef(Lk),i=L.findIndex(q=>q.id===b.dataset.k);if(i>=0){const q=L.splice(i,1)[0];skin().arch.push({id:q.id,n:q.n,from:Lk});saveCfg()}}
+  else if(a==='skrestore'){const k=skin(),i=k.arch.findIndex(q=>q.id===b.dataset.k);if(i>=0){const q=k.arch.splice(i,1)[0];skListRef(q.from).push({id:q.id,n:q.n});saveCfg()}}
+  else if(a==='skdel'){const k=skin(),id=b.dataset.k;if(state.skDel!==id){state.skDel=id}else{k.arch=k.arch.filter(q=>q.id!==id);state.skDel=null;saveCfg()}}
   else if(a==='workout'){const k=b.dataset.k;setDay(d,x=>{const w=new Set(x.workouts||[]);w.has(k)?w.delete(k):w.add(k);x.workouts=[...w]})}
   else if(a==='cycle'){const k=b.dataset.k;setDay(d,x=>{if(x.cycle===k)delete x.cycle;else x.cycle=k})}
   else if(a==='fresh'){if(state.fresh==='confirm'){startFresh();return}state.fresh='confirm'}
@@ -735,7 +776,7 @@ document.addEventListener('click',e=>{
   else if(a==='month'){const key=b.dataset.k||'month',[y,m]=state[key].split('-').map(Number),n=new Date(y,m-1+(+b.dataset.d),1);state[key]=n.getFullYear()+'-'+pad(n.getMonth()+1)}
   else if(a==='open'){state.date=b.dataset.date;state.tab=b.dataset.to||'today';window.scrollTo(0,0)}
   else if(a==='signout'){if(sb)sb.auth.signOut();user=null;state.tab='today';state.days={};state.weeks={};lsSet('lol.days',{});lsSet('lol.weeks',{});}
-  else if(a==='settings'){state.renKey=null;state.delKey=null;state.delW=null;state.wN=10;state.prevTab=state.tab==='settings'?state.prevTab:state.tab;state.tab='settings';state.clearState=null;state.resetState=null;window.scrollTo(0,0)}
+  else if(a==='settings'){state.renKey=null;state.skRen=null;state.skDel=null;state.delKey=null;state.delW=null;state.wN=10;state.prevTab=state.tab==='settings'?state.prevTab:state.tab;state.tab='settings';state.clearState=null;state.resetState=null;window.scrollTo(0,0)}
   else if(a==='closeset'){state.tab=state.prevTab||'today';window.scrollTo(0,0)}
   else if(a==='delhabit'){const k=b.dataset.k,sec=b.dataset.sec;if(state.delKey!==k){state.delKey=k}else{const c=cfg();const ci=c.custom[sec].findIndex(x=>x.k===k);if(ci>=0){c.custom[sec].splice(ci,1);c.hidden=c.hidden.filter(x=>x!==k)}else{c.deleted=c.deleted||[];if(!c.deleted.includes(k))c.deleted.push(k)}state.delKey=null;state.cfg=c;saveCfg()}}
   else if(a==='delweight'){const d=b.dataset.date;if(state.delW!==d){state.delW=d}else{state.delW=null;setDay(d,x=>{delete x.weight})}}
@@ -755,6 +796,7 @@ document.addEventListener('click',e=>{
 let deferred=false;
 function safeRender(){const ae=document.activeElement;if(ae&&(ae.id==='food-note'||ae.id==='weight'||ae.classList.contains('meal-in'))){deferred=true;return}render()}
 document.addEventListener('input',e=>{if(e.target.id==='clear-date'){state.clearDate=e.target.value;if(state.clearState){state.clearState=null;render()}return}if(e.target.id==='weight'){const v=e.target.value.replace(/[^0-9.]/g,'');const n=parseFloat(v);setDay(state.date,x=>{if(v&&!isNaN(n))x.weight=Math.round(n*10)/10;else delete x.weight});return}if(e.target.classList&&e.target.classList.contains('meal-in')){grow(e.target);const k=e.target.dataset.meal,v=e.target.value;setDay(state.date,x=>{const m=Object.assign({},x.meals||{});if(!x.meals&&x.foodNote&&k!=='notes')m.notes=x.foodNote;m[k]=v;Object.keys(m).forEach(z=>{if(!m[z])delete m[z]});x.meals=m;x.foodNote=mealsToNote(m)});return}if(e.target.id==='food-note'){const v=e.target.value;setDay(state.date,x=>{x.foodNote=v})}});
+document.addEventListener('change',e=>{if(e.target.id==='sk-note'){skin().note=e.target.value.trim();saveCfg()}});
 document.addEventListener('focusout',e=>{if((e.target.id==='food-note'||e.target.id==='weight'||(e.target.classList&&e.target.classList.contains('meal-in')))&&deferred){deferred=false;setTimeout(render,0)}});
 let lastDay=todayIso();
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;if(todayIso()!==lastDay){if(state.date===lastDay)state.date=todayIso();lastDay=todayIso();render()}checkForUpdate();if(user)sync()});
@@ -763,6 +805,8 @@ window.addEventListener('online',()=>{if(user)sync()});
 render();
 
 document.addEventListener('submit',async e=>{
+  if(e.target.id==='skren-form'){e.preventDefault();const v=document.getElementById('skren-in').value.trim();if(v){const L=skListRef(state.skList||'am'),q=L.find(z=>z.id===e.target.dataset.k);if(q){q.n=v;saveCfg()}}state.skRen=null;render();return}
+  if(e.target.id==='sk-add'){e.preventDefault();const el=document.getElementById('sk-new'),v=el.value.trim();if(v){skListRef(state.skList||'am').push({id:'s'+Date.now().toString(36),n:v});saveCfg();render();setTimeout(()=>{const i=document.getElementById('sk-new');if(i)i.focus()},0)}return}
   if(e.target.id==='ren-form'){e.preventDefault();const k=e.target.dataset.k,sec=e.target.dataset.sec,v=document.getElementById('ren-in').value.trim().toLowerCase();if(v){const c=cfg();const ci=c.custom[sec].findIndex(x=>x.k===k);if(ci>=0)c.custom[sec][ci].label=v;else{c.labels=c.labels||{};c.labels[k]=v}state.cfg=c;saveCfg()}state.renKey=null;render();return}
   if(e.target.id&&e.target.id.startsWith('add-')){e.preventDefault();const sec=e.target.dataset.sec,inp=e.target.querySelector('input'),v=inp.value.trim().toLowerCase();if(!v)return;const c=cfg();c.custom[sec].push({k:'c_'+Date.now().toString(36),label:v});state.cfg=c;saveCfg();render();setTimeout(()=>{const i=document.getElementById('new-'+sec);if(i)i.focus()},0);return}
   if(e.target.id!=='login')return;e.preventDefault();
