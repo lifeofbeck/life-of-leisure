@@ -301,8 +301,8 @@ const APP_START='2026-10-12';
 const COLORS={morning:'#E8742C',night:'#3B5B9A',spirit:'#1F8A8A',fitness:'#C8322F',diet:'#D9A520',hobby:'#D9486F'};
 const TEXT={morning:'#9A4613',night:'#2C4577',spirit:'#155F5F',fitness:'#9E2522',diet:'#7F5F0D',hobby:'#A5304F'};
 const MOTIF={morning:'sun',night:'moon',spirit:'olive',fitness:'star',diet:'lemon',hobby:'heart'};
-const MORNING=[['hair','Hair'],['makeup','Makeup'],['prayer','Prayer'],['scripture','Daily scripture'],['guasha','Gua sha'],['gut','clean slate'],['skinam','am skincare']];
-const NIGHT=[['digestivo','Cherry digestivo'],['shower','Shower'],['lotion','Body lotion'],['lash','Lash serum'],['retainers','Retainers'],['skinpm','pm skincare']];
+const MORNING=[['hair','Hair'],['makeup','Makeup'],['prayer','Prayer'],['scripture','Daily scripture'],['guasha','Gua sha'],['gut','clean slate']];
+const NIGHT=[['digestivo','Cherry digestivo'],['shower','Shower'],['lotion','Body lotion'],['lash','Lash serum'],['retainers','Retainers']];
 const SPIRIT=['Meeting','Family worship','Personal study','Study for the meeting','Meeting','Study the Watchtower','Service'];
 const WORKOUTS=[['pilates','Pilates'],['sculpt','Sculpt'],['steps','10k steps']];
 const FOOD=[['clean','Clean','#D9A520','#7F5F0D'],['balanced','Balanced','#E8742C','#9A4613'],['better','Could be better','#8A6A4A','#5E4630']];
@@ -389,7 +389,7 @@ function weekStats(mon){
 }
 
 function setDay(d,fn){const x=clone(state.days[d]);x.checks=x.checks||{};fn(x);x.date=d;state.days[d]=x;lsSet('lol.days',state.days);queueSave('days',d,x,pendingDays)}
-const APP_VERSION='2026-11-11-1';
+const APP_VERSION='2026-11-11-2';
 async function checkForUpdate(){
   try{
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
@@ -516,7 +516,7 @@ function renderToday(){
   h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">spiritual</div><div class="caps sec-s">'+FULLDOW[parse(d).getDay()].toLowerCase()+'</div></div><div class="caps">'+(dayChecks(d).spirit?'1':'0')+' / 1</div></div>'+habitRow('spirit',SPIRIT[parse(d).getDay()],d)+'</section>';
   h+=section('night','habits','night',d);
   h+=skinSection(d);
-  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">also today</div><div class="caps sec-s">this week so far</div></div></div>';
+  h+='<section class="sec"><div class="sec-h"><div><div class="sec-t">also today</div></div></div>';
   h+='<div class="group"><div class="group-h"><span class="lbl">workouts</span><span class="sub">'+ws.fit+' this week</span></div><div class="chips">'+WORKOUTS.map(o=>chip('workout',o[0],o[1],w.includes(o[0]))).join('')+'</div></div>';
   {const HL=hobbyList();
   h+='<div class="group"><div class="group-h"><span class="lbl">hobbies</span><span class="sub">'+ws.hobby+' this week</span></div><div class="chips">'+HL.map(o=>chip('hobby',o[0],o[1],hobbiesOf(x).includes(o[0]))).join('')+'</div></div></section>';}
@@ -679,8 +679,10 @@ function renderBody(){
     if(wl.length>5)h+='<button class="more" data-act="wall">'+(state.wAll===state.bmonth?'show less':'see all '+wl.length)+'</button>';}
   return h+'</section>';
 }
-const SKIN_DEFAULT={"am": [{"id": "a1", "n": "Rinse with water"}, {"id": "a2", "n": "Dr. Althea 345"}, {"id": "a3", "n": "Sunscreen"}], "pm": {"0": [{"id": "p0_1", "n": "BYOMA"}, {"id": "p0_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p0_3", "n": "Dr. Althea 345"}], "1": [{"id": "p1_1", "n": "BYOMA"}, {"id": "p1_2", "n": "PanOxyl"}, {"id": "p1_3", "n": "rhode Barrier Restore Cream"}], "2": [{"id": "p2_1", "n": "BYOMA"}, {"id": "p2_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p2_3", "n": "Dr. Althea 345"}, {"id": "p2_4", "n": "Dr. Leo"}], "3": [{"id": "p3_1", "n": "BYOMA"}, {"id": "p3_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p3_3", "n": "Dr. Althea 345"}, {"id": "p3_4", "n": "Dr. Leo"}], "4": [{"id": "p4_1", "n": "BYOMA"}, {"id": "p4_2", "n": "PanOxyl"}, {"id": "p4_3", "n": "rhode Barrier Restore Cream"}], "5": [{"id": "p5_1", "n": "BYOMA"}, {"id": "p5_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p5_3", "n": "Dr. Althea 345"}, {"id": "p5_4", "n": "Dr. Leo"}], "6": [{"id": "p6_1", "n": "BYOMA"}, {"id": "p6_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p6_3", "n": "Dr. Althea 345"}, {"id": "p6_4", "n": "Dr. Leo"}]}, "note": "Cicaplast only on spots that feel dry, tight or flaky, any day.", "arch": []};
-function skin(){const c=cfg();if(!c.skin)c.skin=JSON.parse(JSON.stringify(SKIN_DEFAULT));c.skin.arch=c.skin.arch||[];return c.skin}
+const SKIN_DEFAULT={"am": [{"id": "a1", "n": "Rinse with water"}, {"id": "a2", "n": "Dr. Althea 345 moisturizer"}, {"id": "a3", "n": "Sunscreen"}], "pm": {"0": [{"id": "p0_1", "n": "BYOMA oil cleanser"}, {"id": "p0_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p0_3", "n": "Dr. Althea 345 moisturizer"}], "1": [{"id": "p1_1", "n": "BYOMA oil cleanser"}, {"id": "p1_2", "n": "PanOxyl"}, {"id": "p1_3", "n": "rhode Barrier Restore Cream"}], "2": [{"id": "p2_1", "n": "BYOMA oil cleanser"}, {"id": "p2_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p2_3", "n": "Dr. Althea 345 moisturizer"}, {"id": "p2_4", "n": "Dr. Leo drying lotion"}], "3": [{"id": "p3_1", "n": "BYOMA oil cleanser"}, {"id": "p3_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p3_3", "n": "Dr. Althea 345 moisturizer"}, {"id": "p3_4", "n": "Dr. Leo drying lotion"}], "4": [{"id": "p4_1", "n": "BYOMA oil cleanser"}, {"id": "p4_2", "n": "PanOxyl"}, {"id": "p4_3", "n": "rhode Barrier Restore Cream"}], "5": [{"id": "p5_1", "n": "BYOMA oil cleanser"}, {"id": "p5_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p5_3", "n": "Dr. Althea 345 moisturizer"}, {"id": "p5_4", "n": "Dr. Leo drying lotion"}], "6": [{"id": "p6_1", "n": "BYOMA oil cleanser"}, {"id": "p6_2", "n": "Vanicream/rhode Cleanser"}, {"id": "p6_3", "n": "Dr. Althea 345 moisturizer"}, {"id": "p6_4", "n": "Dr. Leo drying lotion"}]}, "note": "Cicaplast only on spots that feel dry, tight or flaky, any day.", "arch": []};
+function skin(){const c=cfg();if(!c.skin)c.skin=JSON.parse(JSON.stringify(SKIN_DEFAULT));const k=c.skin;k.arch=k.arch||[];
+  if(!k.v){const M={'Dr. Leo':'Dr. Leo drying lotion','Dr. Althea 345':'Dr. Althea 345 moisturizer','BYOMA':'BYOMA oil cleanser'},fix=q=>{if(M[q.n])q.n=M[q.n]};k.am.forEach(fix);Object.values(k.pm).forEach(L=>L.forEach(fix));k.arch.forEach(fix);k.v=2}
+  return k}
 function skSteps(p,date){const k=skin();return p==='am'?k.am:(k.pm[String(parse(date).getDay())]||[])}
 function skDone(p,date){return ((day(date).skin||{})[p])||[]}
 function skSync(x,p,date){const st=skSteps(p,date),dn=((x.skin||{})[p])||[],key=p==='am'?'skinam':'skinpm';if(st.length&&st.every(q=>dn.includes(q.id)))x.checks[key]=true;else delete x.checks[key]}
@@ -688,7 +690,7 @@ function skRow(p,q,date){const on=skDone(p,date).includes(q.id);return '<button 
 function skinSection(date){
   const am=skSteps('am',date),pm=skSteps('pm',date),da=skDone('am',date),dp=skDone('pm',date),k=skin();
   const sa=streakOf(x=>!!dayChecks(x).skinam)[0],sp=streakOf(x=>!!dayChecks(x).skinpm)[0];
-  let h='<section class="sec"><div class="sec-h"><div><div class="sec-t">my skincare routine</div><div class="caps sec-s">'+FULLDOW[parse(date).getDay()].toLowerCase()+'</div></div></div>';
+  let h='<section class="sec"><div class="sec-h"><div><div class="sec-t">skincare routine</div><div class="caps sec-s">'+FULLDOW[parse(date).getDay()].toLowerCase()+'</div></div></div>';
   h+='<div class="group-h sk-h"><span class="lbl">morning</span><span class="sub">'+am.filter(q=>da.includes(q.id)).length+' / '+am.length+'</span></div>'+am.map(q=>skRow('am',q,date)).join('');
   h+='<div class="group-h sk-h"><span class="lbl">tonight</span><span class="sub">'+pm.filter(q=>dp.includes(q.id)).length+' / '+pm.length+'</span></div>'+(pm.length?pm.map(q=>skRow('pm',q,date)).join(''):'<div class="sub" style="padding:10px 0">nothing scheduled tonight.</div>');
   if(k.note)h+='<div class="sk-note">'+esc(k.note)+'</div>';
